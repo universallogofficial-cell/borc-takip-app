@@ -1,3 +1,5 @@
+import { supabase } from "@/lib/supabase";
+
 type AuthGateProps = {
   email: string;
   onEmailChange: (value: string) => void;
@@ -15,6 +17,21 @@ export default function AuthGate({
   message,
   messageType,
 }: AuthGateProps) {
+  const handleGoogleSignIn = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo:
+          typeof window === "undefined" ? undefined : window.location.origin,
+      },
+    });
+
+    if (error) {
+      console.error("Google giriş hatası:", error);
+      window.alert("Google ile giriş başlatılamadı.");
+    }
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
       <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
@@ -60,6 +77,15 @@ export default function AuthGate({
             {isSubmitting
               ? "Giriş bağlantısı gönderiliyor..."
               : "Giriş Bağlantısı Gönder"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={isSubmitting}
+            className="w-full rounded-xl border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Google ile giriş
           </button>
         </form>
 
