@@ -23,6 +23,16 @@ export default function CashForm({
   onSubmit,
   onCancel,
 }: CashFormProps) {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.info("[cash-form] submit", {
+      isEditingCash,
+      addingCash,
+      hasCashName: cashName.trim().length > 0,
+      cashBalance,
+    });
+    onSubmit(e);
+  };
+
   return (
     <div
       className={`rounded-2xl p-5 shadow-sm ring-1 ${
@@ -35,7 +45,7 @@ export default function CashForm({
         {isEditingCash ? "Kasa Düzenle" : "Yeni Kasa Ekle"}
       </h2>
 
-      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
+      <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm text-gray-600">Kasa Adı</label>
           <input

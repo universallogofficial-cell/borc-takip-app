@@ -5,6 +5,7 @@ import {
   fetchCashItems,
   updateCashItem,
 } from "@/lib/cashService";
+import { getErrorMessage } from "@/lib/errorMessage";
 import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
 import { countPaymentsByCashId } from "@/lib/paymentService";
 import { isBlank, parseNumber } from "@/lib/validation";
@@ -47,11 +48,16 @@ export function useCashManager({
   const [isEditingCash, setIsEditingCash] = useState<boolean>(false);
 
   const fetchCash = async () => {
+    console.info("[cash-manager] fetchCash:start", {
+      userId: userId ?? null,
+    });
+
     if (!userId) {
       setCurrentCash(0);
       setCashList([]);
       setLoadingCash(false);
-      return;
+      console.info("[cash-manager] fetchCash:skipped-no-user");
+      return [];
     }
 
     setLoadingCash(true);
@@ -65,13 +71,26 @@ export function useCashManager({
       }, 0);
 
       setCurrentCash(totalCash);
+      console.info("[cash-manager] fetchCash:success", {
+        count: safeData.length,
+        ids: safeData.map((item) => item.id),
+      });
+      return safeData;
     } catch (error) {
       console.error("Cash verisi alınamadı:", error);
       setCurrentCash(0);
       setCashList([]);
-      onMessage("Kasa verisi alınamadı.", "error");
+      onMessage(
+        `Kasa verisi alınamadı: ${getErrorMessage(
+          error,
+          "Bilinmeyen hata",
+        )}`,
+        "error",
+      );
+      return [];
     } finally {
       setLoadingCash(false);
+      console.info("[cash-manager] fetchCash:end");
     }
   };
 
@@ -111,19 +130,32 @@ export function useCashManager({
 
   const handleAddCash = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.info("[cash-manager] handleAddCash:start", {
+      isEditingCash,
+      editingCashId,
+      userId: userId ?? null,
+    });
 
     if (addingCash) {
+      console.info("[cash-manager] handleAddCash:skipped-already-submitting");
       return;
     }
 
     if (isBlank(cashName)) {
       onMessage("Kasa adı zorunludur.", "error");
+      console.info("[cash-manager] handleAddCash:validation-failed", {
+        reason: "missing_name",
+      });
       return;
     }
 
     const balanceValue = parseNumber(cashBalance);
     if (balanceValue === null) {
       onMessage("Bakiye için geçerli bir sayı girin.", "error");
+      console.info("[cash-manager] handleAddCash:validation-failed", {
+        reason: "invalid_balance",
+        rawBalance: cashBalance,
+      });
       return;
     }
 
@@ -151,13 +183,29 @@ export function useCashManager({
           amount: cashPayload.balance,
         });
         onMessage("Kasa güncellendi.", "success");
+        console.info("[cash-manager] handleAddCash:update-success", {
+          editingCashId,
+        });
         return;
       }
 
       await addCashItem(cashPayload, scopeOptions);
+      console.info("[cash-manager] handleAddCash:insert-success", {
+        name: cashPayload.name,
+        balance: cashPayload.balance,
+        userId: userId ?? null,
+      });
 
       resetCashForm();
-      await fetchCash();
+      const refreshedCash = await fetchCash();
+      console.info("[cash-manager] handleAddCash:fetch-after-insert", {
+        count: refreshedCash.length,
+        containsNewCash: refreshedCash.some(
+          (item) =>
+            item.name === cashPayload.name &&
+            roundCurrency(toSafeNumber(item.balance)) === cashPayload.balance,
+        ),
+      });
       onActivity?.({
         entityType: "cash",
         entityId: Date.now(),
@@ -170,25 +218,17 @@ export function useCashManager({
       });
       onMessage("Kasa eklendi.", "success");
     } catch (error) {
+      const errorMessage = getErrorMessage(error, "Bilinmeyen hata");
       if (isEditingCash && editingCashId !== null) {
         console.error("Cash guncelleme hatasi:", error);
-        onMessage(
-          error instanceof Error
-            ? `Kasa güncellenemedi: ${error.message}`
-            : "Kasa güncellenemedi.",
-          "error",
-        );
+        onMessage(`Kasa güncellenemedi: ${errorMessage}`, "error");
       } else {
         console.error("Cash ekleme hatası:", error);
-        onMessage(
-          error instanceof Error
-            ? `Kasa eklenemedi: ${error.message}`
-            : "Kasa eklenemedi.",
-          "error",
-        );
+        onMessage(`Kasa eklenemedi: ${errorMessage}`, "error");
       }
     } finally {
       setAddingCash(false);
+      console.info("[cash-manager] handleAddCash:end");
     }
   };
 
