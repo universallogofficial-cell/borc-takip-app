@@ -11,7 +11,6 @@ import PayoffPlanner from "@/components/PayoffPlanner";
 import RecentActivity from "@/components/RecentActivity";
 import RiskOverview from "@/components/RiskOverview";
 import SettingsPanel from "@/components/SettingsPanel";
-import SummaryCards from "@/components/SummaryCards";
 import UpcomingPayments from "@/components/UpcomingPayments";
 import CashPanel from "@/components/CashPanel";
 import ClosedDebts from "@/components/ClosedDebts";
@@ -61,16 +60,21 @@ import type {
   FlashMessageType,
   PayoffStrategy,
   RecentActivityItem,
-  SummaryCard,
+  UserProfile,
 } from "@/types/finance";
 
 export type AppSection = "dashboard" | "debts" | "cash" | "payments" | "settings";
 
 const ACTIVITY_STORAGE_KEY = "borc-takip-recent-activity";
 const SETTINGS_STORAGE_KEY = "borc-takip-settings";
+const PROFILE_STORAGE_KEY = "borc-takip-user-profile";
 const defaultSettings: AppSettings = {
   currencyCode: "TRY",
   confirmDestructiveActions: true,
+};
+const defaultProfile: UserProfile = {
+  firstName: "",
+  lastName: "",
 };
 
 const pageConfig: Record<AppSection, { title: string; subtitle: string }> = {
@@ -145,6 +149,90 @@ function DashboardLoadingSkeleton() {
   );
 }
 
+function FinancialSummaryCard({
+  currencyCode,
+  safeSpendableBalance,
+  thisMonthLoad,
+  thisMonthPayments,
+  upcomingCount,
+  monthEndProjection,
+  riskLabel,
+  riskSummary,
+}: {
+  currencyCode: CurrencyCode;
+  safeSpendableBalance: number;
+  thisMonthLoad: number;
+  thisMonthPayments: number;
+  upcomingCount: number;
+  monthEndProjection: number;
+  riskLabel: string;
+  riskSummary: string;
+}) {
+  const toneClass =
+    riskLabel === "Risk altındasın"
+      ? "from-red-600 via-red-500 to-orange-500"
+      : riskLabel === "Dikkatli ol"
+        ? "from-amber-500 via-orange-400 to-yellow-400"
+        : "from-emerald-600 via-teal-500 to-sky-500";
+
+  return (
+    <section className={`rounded-[32px] bg-gradient-to-br ${toneClass} p-6 text-white shadow-lg md:p-7`}>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
+            Finans Özeti
+          </p>
+          <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+            {formatCurrency(safeSpendableBalance, currencyCode)}
+          </h2>
+          <p className="mt-2 text-sm font-medium text-white/85">
+            Harcanabilir güvenli bakiye
+          </p>
+          <div className="mt-5 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
+            {riskLabel}
+          </div>
+          <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85">
+            {riskSummary}
+          </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
+              Bu Ay Toplam Yük
+            </p>
+            <p className="mt-2 text-lg font-semibold">
+              {formatCurrency(thisMonthLoad, currencyCode)}
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
+              Bu Ay Ödenen
+            </p>
+            <p className="mt-2 text-lg font-semibold">
+              {formatCurrency(thisMonthPayments, currencyCode)}
+            </p>
+          </div>
+          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
+              Yaklaşan Ödeme
+            </p>
+            <p className="mt-2 text-lg font-semibold">{upcomingCount}</p>
+          </div>
+          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
+            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
+              Ay Sonu Tahmini
+            </p>
+            <p className="mt-2 text-lg font-semibold">
+              {formatCurrency(monthEndProjection, currencyCode)}
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const [message, setMessage] = useState<FlashMessage | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -156,6 +244,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     null,
   );
   const [settings, setSettings] = useState<AppSettings>(defaultSettings);
+  const [profile, setProfile] = useState<UserProfile>(defaultProfile);
   const [runtimeActivities, setRuntimeActivities] = useState<RecentActivityItem[]>(
     [],
   );
@@ -169,6 +258,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const authContext = useMemo(
     () => buildAuthContext(session?.user.id ?? null),
     [session?.user.id],
+  );
+  const profileStorageKey = useMemo(
+    () => (authContext.userId ? `${PROFILE_STORAGE_KEY}:${authContext.userId}` : null),
+    [authContext.userId],
   );
   const activityStorageKey = useMemo(
     () => (authContext.userId ? `${ACTIVITY_STORAGE_KEY}:${authContext.userId}` : null),
@@ -398,6 +491,30 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   }, [authContext.userId]);
 
   useEffect(() => {
+    if (!profileStorageKey) {
+      setProfile(defaultProfile);
+      return;
+    }
+
+    const storedProfile = window.localStorage.getItem(profileStorageKey);
+    if (!storedProfile) {
+      setProfile(defaultProfile);
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(storedProfile) as Partial<UserProfile>;
+      setProfile({
+        firstName: parsed.firstName?.trim() || "",
+        lastName: parsed.lastName?.trim() || "",
+      });
+    } catch {
+      window.localStorage.removeItem(profileStorageKey);
+      setProfile(defaultProfile);
+    }
+  }, [profileStorageKey]);
+
+  useEffect(() => {
     if (!activityStorageKey) {
       setRuntimeActivities([]);
       return;
@@ -433,11 +550,13 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   }, [settings]);
 
-  const totalDebt = useMemo(
-    () =>
-      debts.reduce((sum, item) => sum + toSafeNumber(item.remaining_debt), 0),
-    [debts],
-  );
+  useEffect(() => {
+    if (!profileStorageKey) {
+      return;
+    }
+
+    window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
+  }, [profile, profileStorageKey]);
 
   const { items: upcomingPaymentItems, summary: upcomingPaymentSummary } =
     useMemo(() => buildUpcomingPayments(debts), [debts]);
@@ -481,33 +600,19 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const isCashPageLoading = loadingCash && cashList.length === 0;
   const isPlannerLoading =
     (loadingCash || loadingDebts) && debts.length === 0 && cashList.length === 0;
-  const summaryCards: SummaryCard[] = useMemo(
-    () => [
-      {
-        title: "Toplam Nakit",
-        value: formatCurrency(currentCash, settings.currencyCode),
-      },
-      {
-        title: "Toplam Borç",
-        value: formatCurrency(totalDebt, settings.currencyCode),
-      },
-      {
-        title: "Minimum Ödeme Toplamı",
-        value: formatCurrency(minimumPaymentTotal, settings.currencyCode),
-      },
-      {
-        title: "Harcanabilir Güvenli Bakiye",
-        value: formatCurrency(safeSpendableBalance, settings.currencyCode),
-      },
-    ],
-    [
-      currentCash,
-      minimumPaymentTotal,
-      safeSpendableBalance,
-      settings.currencyCode,
-      totalDebt,
-    ],
+  const monthEndProjection = useMemo(
+    () => roundCurrency(currentCash - upcomingPaymentSummary.totalMinimumPayment),
+    [currentCash, upcomingPaymentSummary.totalMinimumPayment],
   );
+  const hasProfile = Boolean(profile.firstName.trim() && profile.lastName.trim());
+  const hasCash = cashList.length > 0;
+  const hasDebt = debts.length > 0;
+  const hasPayment = payments.length > 0;
+  const shouldShowOnboarding =
+    !isDashboardLoading && (!hasProfile || !hasCash || !hasDebt || !hasPayment);
+  const displayName = hasProfile
+    ? `${profile.firstName.trim()} ${profile.lastName.trim()}`
+    : session?.user.email || "E-posta bilgisi olmayan hesap";
 
   const displayDebtTableData = useMemo(
     () =>
@@ -527,7 +632,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       action: "created",
       actionLabel: "Borç eklendi",
       title: item.name,
-      description: item.institution || "Borç kaydı oluşturuldu.",
+      description:
+        item.institution && item.product_type
+          ? `${item.institution} • ${item.product_type}`
+          : item.institution || item.product_type || "Borç portföye eklendi.",
       amount: roundCurrency(toSafeNumber(item.remaining_debt)),
       createdAt: item.created_at,
     }));
@@ -540,7 +648,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       action: "created",
       actionLabel: "Kasa eklendi",
       title: item.name,
-      description: item.note || "Kasa kaydı oluşturuldu.",
+      description: item.note || "Bakiye planlamasına dahil edildi.",
       amount: roundCurrency(toSafeNumber(item.balance)),
       createdAt: item.created_at,
     }));
@@ -556,7 +664,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
         action: "payment_made",
         actionLabel: "Ödeme yapıldı",
         title: paymentRow?.debtName || `Ödeme #${item.id}`,
-        description: paymentRow?.cashName || "Ödeme kaydı oluşturuldu.",
+        description:
+          paymentRow?.cashName
+            ? `${paymentRow.cashName} kasasından işlendi.`
+            : "Ödeme hareketi kaydedildi.",
         amount: roundCurrency(toSafeNumber(item.amount)),
         createdAt: item.created_at,
       };
@@ -588,14 +699,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       )
       .slice(0, 12);
   }, [derivedActivities, runtimeActivities]);
-
-  const isOnboardingEmpty =
-    !loadingCash &&
-    !loadingDebts &&
-    !loadingPayments &&
-    cashList.length === 0 &&
-    debts.length === 0 &&
-    payments.length === 0;
 
   const handleExportCash = () => {
     try {
@@ -870,6 +973,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     try {
       await signOutUser();
       setAuthEmail("");
+      setProfile(defaultProfile);
       setPendingBackup(null);
       setBackupPreview(null);
       showAuthMessage("Oturum kapatıldı.", "success");
@@ -877,6 +981,24 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       console.error("Auth çıkış hatası:", error);
       showAuthMessage("Oturum kapatılamadı.", "error");
     }
+  };
+
+  const handleSaveProfile = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const normalizedFirstName = profile.firstName.trim();
+    const normalizedLastName = profile.lastName.trim();
+
+    if (!normalizedFirstName || !normalizedLastName) {
+      showMessage("İsim ve soyisim alanlarını birlikte doldurun.", "error");
+      return;
+    }
+
+    setProfile({
+      firstName: normalizedFirstName,
+      lastName: normalizedLastName,
+    });
+    showMessage("Profil bilgileri kaydedildi.", "success");
   };
 
   if (authLoading) {
@@ -928,7 +1050,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
         <div className="flex flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-900">
-              {session.user.email || "E-posta bilgisi olmayan hesap"}
+              {displayName}
             </p>
             <p className="mt-1 text-xs text-gray-500">
               {getAuthModeLabel(authContext)} • Para birimi: {settings.currencyCode} •
@@ -959,11 +1081,35 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
           <>
             {isDashboardLoading ? (
               <DashboardLoadingSkeleton />
-            ) : isOnboardingEmpty ? (
-              <OnboardingEmptyState email={session.user.email || null} />
+            ) : shouldShowOnboarding ? (
+              <OnboardingEmptyState
+                email={session.user.email || null}
+                firstName={profile.firstName}
+                lastName={profile.lastName}
+                onFirstNameChange={(value) =>
+                  setProfile((prev) => ({ ...prev, firstName: value }))
+                }
+                onLastNameChange={(value) =>
+                  setProfile((prev) => ({ ...prev, lastName: value }))
+                }
+                onSaveProfile={handleSaveProfile}
+                hasProfile={hasProfile}
+                hasCash={hasCash}
+                hasDebt={hasDebt}
+                hasPayment={hasPayment}
+              />
             ) : (
               <>
-                <SummaryCards cards={summaryCards} />
+                <FinancialSummaryCard
+                  currencyCode={settings.currencyCode}
+                  safeSpendableBalance={safeSpendableBalance}
+                  thisMonthLoad={minimumPaymentTotal}
+                  thisMonthPayments={thisMonthPaymentAmount}
+                  upcomingCount={upcomingPaymentSummary.urgentCount}
+                  monthEndProjection={monthEndProjection}
+                  riskLabel={cashRiskSummary.statusLabel}
+                  riskSummary={cashRiskSummary.summaryText}
+                />
 
                 <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
                   <div className="mb-4">
@@ -1137,6 +1283,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
               cashList={cashList}
               paymentForm={paymentForm}
               setPaymentForm={setPaymentForm}
+              currencyCode={settings.currencyCode}
               addingPayment={addingPayment}
               isEditingPayment={editingPaymentId !== null}
               editingPaymentId={editingPaymentId}

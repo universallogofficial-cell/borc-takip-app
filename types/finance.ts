@@ -60,6 +60,11 @@ export type AuthContext = {
   mode: "demo" | "scoped";
 };
 
+export type UserProfile = {
+  firstName: string;
+  lastName: string;
+};
+
 export type RecentActivityItem = {
   id: string;
   source: "derived" | "runtime";

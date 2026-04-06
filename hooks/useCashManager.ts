@@ -147,7 +147,7 @@ export function useCashManager({
           action: "updated",
           actionLabel: "Kasa güncellendi",
           title: cashPayload.name,
-          description: "Kasa kaydı güncellendi.",
+          description: "Kasa bakiyesi ve not bilgileri güncellendi.",
           amount: cashPayload.balance,
         });
         onMessage("Kasa güncellendi.", "success");
@@ -164,7 +164,7 @@ export function useCashManager({
         action: "created",
         actionLabel: "Kasa eklendi",
         title: createdCash.name,
-        description: "Yeni kasa kaydı oluşturuldu.",
+        description: "Nakit planına yeni kasa kaydı eklendi.",
         amount: cashPayload.balance,
         createdAt: createdCash.created_at,
       });
@@ -219,7 +219,7 @@ export function useCashManager({
         action: "deleted",
         actionLabel: "Kasa silindi",
         title: `Kasa #${id}`,
-        description: "Kasa kaydı sistemden kaldırıldı.",
+        description: "Kasa kaydı nakit planından kaldırıldı.",
         amount: null,
       });
       onMessage("Kasa silindi.", "success");

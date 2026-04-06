@@ -186,22 +186,26 @@ export function buildCashRiskSummary(
     "Nakit görünümü mevcut minimum ödeme yükü ile uyumlu görünüyor.";
 
   if (currentCash <= 0 && monthlyMinimumLoad > 0) {
-    statusLabel = "Kritik";
+    statusLabel = "Risk altındasın";
     summaryText =
       "Mevcut nakit görünmüyor. Minimum ödeme yükü için kısa vadede kaynak planı gerekiyor.";
   } else if (isInsufficient) {
-    statusLabel = "Riskli";
+    statusLabel = "Risk altındasın";
     summaryText = `Yakın dönem ödemeleri karşılamak için ${roundCurrency(
       Math.abs(gap),
     )} ek nakit gerekiyor.`;
   } else if (safeSpendableBalance < 0) {
-    statusLabel = "Sıkışık";
+    statusLabel = "Dikkatli ol";
     summaryText =
       "Yakın dönem ödemeleri karşılayabiliyorsunuz ancak aylık minimum ödeme yükü mevcut nakdi zorluyor.";
   } else if (urgentDebtCount >= 3) {
-    statusLabel = "Dikkat";
+    statusLabel = "Dikkatli ol";
     summaryText =
       "Birden fazla yaklaşan ödeme var. Nakit yeterli olsa da önceliklendirme önemli.";
+  } else {
+    statusLabel = "Durum iyi";
+    summaryText =
+      "Minimum ödeme yükü ve yakın dönem takvim mevcut nakit görünümüyle dengeli ilerliyor.";
   }
 
   return {

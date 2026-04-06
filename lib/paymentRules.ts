@@ -147,13 +147,17 @@ export function buildPaymentUpdatePlans({
   }
 
   if (debtPlans.some((plan) => plan.nextRemainingDebt < 0)) {
-    return { data: null, error: "Ödeme tutarı kalan borçtan büyük olamaz." };
+    return {
+      data: null,
+      error: "Ödeme tutarı toplam borçtan büyük olamaz. Tutarı düşürüp tekrar deneyin.",
+    };
   }
 
   if (cashPlans.some((plan) => plan.nextBalance < 0)) {
     return {
       data: null,
-      error: "Seçilen kasanın bakiyesi ödeme için yeterli değil.",
+      error:
+        "Seçilen kasada yeterli bakiye yok. Tutarı düşürün veya farklı kasa seçin.",
     };
   }
 

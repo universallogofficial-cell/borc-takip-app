@@ -1,10 +1,18 @@
-import type { CashItem, DebtRow, PaymentFormData } from "@/types/finance";
+import { formatCurrency } from "@/lib/formatCurrency";
+import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
+import type {
+  CashItem,
+  CurrencyCode,
+  DebtRow,
+  PaymentFormData,
+} from "@/types/finance";
 
 type PaymentFormProps = {
   debts: DebtRow[];
   cashList: CashItem[];
   paymentForm: PaymentFormData;
   setPaymentForm: React.Dispatch<React.SetStateAction<PaymentFormData>>;
+  currencyCode: CurrencyCode;
   addingPayment: boolean;
   isEditingPayment: boolean;
   editingPaymentId: number | null;
@@ -17,25 +25,57 @@ export default function PaymentForm({
   cashList,
   paymentForm,
   setPaymentForm,
+  currencyCode,
   addingPayment,
   isEditingPayment,
   editingPaymentId,
   onSubmit,
   onCancel,
 }: PaymentFormProps) {
+  const selectedDebt =
+    debts.find((debt) => String(debt.id) === paymentForm.debtId) ?? null;
+  const selectedCash =
+    cashList.find((cash) => String(cash.id) === paymentForm.cashId) ?? null;
+  const selectedDebtMinimum = roundCurrency(
+    toSafeNumber(selectedDebt?.minimum_payment ?? null),
+  );
+  const selectedDebtRemaining = roundCurrency(
+    toSafeNumber(selectedDebt?.remaining_debt ?? null),
+  );
+  const selectedCashBalance = roundCurrency(toSafeNumber(selectedCash?.balance ?? null));
+  const parsedAmount = Number(paymentForm.amount);
+  const hasAmount = Number.isFinite(parsedAmount) && parsedAmount > 0;
+  const exceedsBalance = hasAmount && selectedCash !== null && parsedAmount > selectedCashBalance;
+  const exceedsDebt = hasAmount && selectedDebt !== null && parsedAmount > selectedDebtRemaining;
+
+  const applySuggestedAmount = (value: number) => {
+    setPaymentForm((prev) => ({
+      ...prev,
+      amount: value > 0 ? String(roundCurrency(value)) : "",
+    }));
+  };
+
   return (
     <div
-      className={`rounded-2xl p-5 shadow-sm ring-1 ${
-        isEditingPayment
-          ? "bg-sky-50 ring-sky-300"
-          : "bg-white ring-gray-200"
+      className={`rounded-[28px] p-5 shadow-sm ring-1 md:p-6 ${
+        isEditingPayment ? "bg-sky-50 ring-sky-300" : "bg-white ring-gray-200"
       }`}
     >
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        {isEditingPayment ? "Ödeme Düzenle" : "Ödeme Yap"}
-      </h2>
+      <div className="mb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+          Ödeme Girişi
+        </p>
+        <h2 className="mt-2 text-xl font-semibold text-gray-900">
+          {isEditingPayment ? "Ödeme Kaydını Düzenle" : "Ödeme Yap"}
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-gray-500">
+          Borç ve kasa seçildiğinde uygun ödeme aralığını anında görün. Hızlı öneriler
+          ile veri girişi daha kısa sürer.
+        </p>
+      </div>
+
       {isEditingPayment && editingPaymentId !== null && (
-        <p className="mb-4 text-sm text-sky-700">
+        <p className="mb-4 rounded-xl bg-sky-100 px-3 py-2 text-sm text-sky-800">
           Düzenlenen ödeme ID: {editingPaymentId}
         </p>
       )}
@@ -49,7 +89,7 @@ export default function PaymentForm({
               setPaymentForm((prev) => ({ ...prev, debtId: e.target.value }))
             }
             disabled={addingPayment}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
           >
             <option value="">Borç seçin</option>
             {debts.map((debt) => (
@@ -58,6 +98,12 @@ export default function PaymentForm({
               </option>
             ))}
           </select>
+          {selectedDebt && (
+            <p className="mt-2 text-xs leading-5 text-gray-500">
+              Kalan: {formatCurrency(selectedDebtRemaining, currencyCode)} • Asgari:{" "}
+              {formatCurrency(selectedDebtMinimum, currencyCode)}
+            </p>
+          )}
         </div>
 
         <div>
@@ -68,7 +114,7 @@ export default function PaymentForm({
               setPaymentForm((prev) => ({ ...prev, cashId: e.target.value }))
             }
             disabled={addingPayment}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
           >
             <option value="">Kasa seçin</option>
             {cashList.map((cash) => (
@@ -77,23 +123,80 @@ export default function PaymentForm({
               </option>
             ))}
           </select>
+          {selectedCash && (
+            <p className="mt-2 text-xs leading-5 text-gray-500">
+              Kullanılabilir bakiye: {formatCurrency(selectedCashBalance, currencyCode)}
+            </p>
+          )}
+        </div>
+
+        <div className="md:col-span-2 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Hızlı Tutar
+          </p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              type="button"
+              disabled={addingPayment || selectedDebtMinimum <= 0}
+              onClick={() => applySuggestedAmount(selectedDebtMinimum)}
+              className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Asgari ödeme
+            </button>
+            <button
+              type="button"
+              disabled={addingPayment || selectedDebtRemaining <= 0}
+              onClick={() => applySuggestedAmount(selectedDebtRemaining)}
+              className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Borcu kapat
+            </button>
+            <button
+              type="button"
+              disabled={
+                addingPayment ||
+                selectedDebtRemaining <= 0 ||
+                selectedCashBalance <= 0
+              }
+              onClick={() =>
+                applySuggestedAmount(Math.min(selectedDebtRemaining, selectedCashBalance))
+              }
+              className="rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Güvenli maksimum
+            </button>
+          </div>
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">
-            Ödeme Tutarı
-          </label>
+          <label className="mb-1 block text-sm text-gray-600">Ödeme Tutarı</label>
           <input
             type="number"
             step="0.01"
+            min="0"
             value={paymentForm.amount}
             onChange={(e) =>
               setPaymentForm((prev) => ({ ...prev, amount: e.target.value }))
             }
             disabled={addingPayment}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
             placeholder="Örn: 1000"
           />
+          {exceedsBalance && (
+            <p className="mt-2 text-xs leading-5 text-red-600">
+              Bu tutar seçili kasanın bakiyesini aşıyor.
+            </p>
+          )}
+          {!exceedsBalance && exceedsDebt && (
+            <p className="mt-2 text-xs leading-5 text-red-600">
+              Bu tutar seçili borcun toplam borcundan büyük.
+            </p>
+          )}
+          {!exceedsBalance && !exceedsDebt && selectedDebt && selectedCash && (
+            <p className="mt-2 text-xs leading-5 text-gray-500">
+              Seçili kasa ve borç için mantıklı aralık otomatik kontrol edilir.
+            </p>
+          )}
         </div>
 
         <div className="md:col-span-2">
@@ -104,8 +207,8 @@ export default function PaymentForm({
               setPaymentForm((prev) => ({ ...prev, note: e.target.value }))
             }
             disabled={addingPayment}
-            className="min-h-[80px] w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
-            placeholder="Ödeme notu"
+            className="min-h-[88px] w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            placeholder="İsteğe bağlı kısa not"
           />
         </div>
 
@@ -113,7 +216,7 @@ export default function PaymentForm({
           <button
             type="submit"
             disabled={addingPayment}
-            className="rounded-xl bg-sky-600 px-4 py-2 text-white transition hover:bg-sky-700 disabled:opacity-50"
+            className="rounded-xl bg-sky-600 px-4 py-2.5 text-white transition hover:bg-sky-700 disabled:opacity-50"
           >
             {addingPayment
               ? isEditingPayment
@@ -128,7 +231,7 @@ export default function PaymentForm({
               type="button"
               onClick={onCancel}
               disabled={addingPayment}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-100 disabled:opacity-50"
+              className="rounded-xl border border-gray-300 px-4 py-2.5 text-gray-700 transition hover:bg-gray-100 disabled:opacity-50"
             >
               İptal
             </button>

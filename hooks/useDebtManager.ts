@@ -145,17 +145,20 @@ export function useDebtManager({
 
     const remainingDebtValue = parseNumber(remainingDebt);
     if (remainingDebtValue === null || remainingDebtValue < 0) {
-      onMessage("Kalan borç için negatif olmayan geçerli bir sayı girin.", "error");
+      onMessage(
+        "Toplam borç için negatif olmayan geçerli bir sayı girin.",
+        "error",
+      );
       return;
     }
 
     const minimumPaymentValue = parseOptionalNumber(minimumPayment);
     if (minimumPaymentValue !== null && minimumPaymentValue < 0) {
-      onMessage("Minimum ödeme negatif olamaz.", "error");
+      onMessage("Asgari ödeme tutarı negatif olamaz.", "error");
       return;
     }
     if (!isBlank(minimumPayment) && minimumPaymentValue === null) {
-      onMessage("Minimum ödeme için geçerli bir sayı girin.", "error");
+      onMessage("Asgari ödeme tutarı için geçerli bir sayı girin.", "error");
       return;
     }
 
@@ -204,7 +207,8 @@ export function useDebtManager({
           action: "updated",
           actionLabel: "Borç güncellendi",
           title: debtPayload.name,
-          description: "Borç kaydı güncellendi.",
+          description:
+            debtPayload.institution || "Borç planı güncellenerek portföye işlendi.",
           amount: debtPayload.remaining_debt,
         });
         onMessage("Borç güncellendi.", "success");
@@ -221,7 +225,8 @@ export function useDebtManager({
         action: "created",
         actionLabel: "Borç eklendi",
         title: createdDebt.name,
-        description: "Yeni borç kaydı oluşturuldu.",
+        description:
+          createdDebt.institution || "Yeni borç kaydı planlamaya eklendi.",
         amount: debtPayload.remaining_debt,
         createdAt: createdDebt.created_at,
       });
@@ -268,7 +273,7 @@ export function useDebtManager({
         action: "deleted",
         actionLabel: "Borç silindi",
         title: `Borç #${id}`,
-        description: "Borç kaydı sistemden kaldırıldı.",
+        description: "Borç kaydı portföyden kaldırıldı.",
         amount: null,
       });
       onMessage("Borç silindi.", "success");
@@ -279,6 +284,13 @@ export function useDebtManager({
   };
 
   const handleEditDebt = (item: DebtTableItem) => {
+    const debt = debts.find((row) => row.id === item.id);
+
+    if (debt) {
+      handleEditDebtRow(debt);
+      return;
+    }
+
     const dueDayMatch = item.dueDate.match(/\d+/);
 
     setDebtName(item.name);

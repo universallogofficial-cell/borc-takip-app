@@ -444,7 +444,9 @@ export function usePaymentManager({
           actionLabel: "Ödeme güncellendi",
           title: debtMap.get(selection.debtId)?.name || "Ödeme",
           description:
-            cashMap.get(selection.cashId)?.name || "Ödeme kaydı güncellendi.",
+            cashMap.get(selection.cashId)?.name
+              ? `${cashMap.get(selection.cashId)?.name} kasası üzerinden güncellendi.`
+              : "Ödeme kaydı güncellendi.",
           amount: selection.amount,
         });
         onMessage("Ödeme güncellendi.", "success");
@@ -500,7 +502,9 @@ export function usePaymentManager({
           actionLabel: "Ödeme yapıldı",
           title: debtMap.get(selection.debtId)?.name || "Ödeme",
           description:
-            cashMap.get(selection.cashId)?.name || "Yeni ödeme kaydı oluşturuldu.",
+            cashMap.get(selection.cashId)?.name
+              ? `${cashMap.get(selection.cashId)?.name} kasasından ödendi.`
+              : "Yeni ödeme kaydı oluşturuldu.",
           amount: selection.amount,
         });
       }
@@ -603,7 +607,9 @@ export function usePaymentManager({
         actionLabel: "Ödeme silindi",
         title: debtMap.get(payment.debt_id)?.name || "Ödeme",
         description:
-          cashMap.get(payment.cash_id)?.name || "Ödeme kaydı kaldırıldı.",
+          cashMap.get(payment.cash_id)?.name
+            ? `${cashMap.get(payment.cash_id)?.name} kasasındaki kayıt geri alındı.`
+            : "Ödeme kaydı kaldırıldı.",
         amount: paymentAmount,
       });
       onMessage("Ödeme silindi.", "success");
