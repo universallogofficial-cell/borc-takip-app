@@ -1,14 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import AuthGate from "@/components/AuthGate";
 import BackupPanel from "@/components/BackupPanel";
-import DashboardTrends from "@/components/DashboardTrends";
 import CashForm from "@/components/CashForm";
-import OnboardingEmptyState from "@/components/OnboardingEmptyState";
-import OperationsOverview from "@/components/OperationsOverview";
-import PayoffPlanner from "@/components/PayoffPlanner";
 import RecentActivity from "@/components/RecentActivity";
 import RiskOverview from "@/components/RiskOverview";
 import SettingsPanel from "@/components/SettingsPanel";
@@ -39,16 +36,10 @@ import {
   signOutUser,
   subscribeToAuthChanges,
 } from "@/lib/auth";
-import {
-  buildDataHealthSummary,
-  buildOperationsOverviewSummary,
-  buildRecommendedActions,
-} from "@/lib/dataHealth";
 import { exportCsv } from "@/lib/exportCsv";
 import { getDebtLifecycleStatus } from "@/lib/debtLifecycle";
 import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
 import { formatCurrency, formatDateTime } from "@/lib/formatCurrency";
-import { buildPayoffScenario, parsePayoffExtraBudget } from "@/lib/payoffPlanner";
 import { addCashItem } from "@/lib/cashService";
 import { addDebtItem } from "@/lib/debtService";
 import { createPaymentItem } from "@/lib/paymentService";
@@ -63,10 +54,8 @@ import type {
   AppSettings,
   BackupPreview,
   CurrencyCode,
-  DashboardTrendItem,
   FlashMessage,
   FlashMessageType,
-  PayoffStrategy,
   RecentActivityItem,
   SummaryCard,
 } from "@/types/finance";
@@ -125,10 +114,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const [backupPreview, setBackupPreview] = useState<BackupPreview | null>(null);
   const [pendingBackup, setPendingBackup] = useState<AppBackup | null>(null);
   const [isImportingBackup, setIsImportingBackup] = useState<boolean>(false);
-  const [selectedPayoffStrategy, setSelectedPayoffStrategy] =
-    useState<PayoffStrategy>("highest_interest");
-  const [plannerExtraBudget, setPlannerExtraBudget] = useState<string>("");
-  const [lastSyncedAt, setLastSyncedAt] = useState<string | null>(null);
   const messageTimeoutRef = useRef<number | null>(null);
   const authContext = useMemo(
     () => buildAuthContext(session?.user.id ?? null),
@@ -317,7 +302,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       setMessage(null);
       setPendingBackup(null);
       setBackupPreview(null);
-      setLastSyncedAt(null);
     });
 
     const storedSettings = window.localStorage.getItem(SETTINGS_STORAGE_KEY);
@@ -395,59 +379,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
   }, [settings]);
 
-  useEffect(() => {
-    if (!loadingCash && !loadingDebts && !loadingPayments) {
-      setLastSyncedAt(new Date().toISOString());
-    }
-  }, [loadingCash, loadingDebts, loadingPayments]);
-
   const totalDebt = useMemo(
     () =>
       debts.reduce((sum, item) => sum + toSafeNumber(item.remaining_debt), 0),
     [debts],
-  );
-
-  const activeDebtCount = useMemo(
-    () => debts.filter((item) => toSafeNumber(item.remaining_debt) > 0).length,
-    [debts],
-  );
-
-  const closedDebtCount = useMemo(
-    () => debts.filter((item) => toSafeNumber(item.remaining_debt) <= 0).length,
-    [debts],
-  );
-
-  const summaryCards: SummaryCard[] = useMemo(
-    () => [
-      {
-        title: "Toplam Nakit",
-        value: formatCurrency(currentCash, settings.currencyCode),
-      },
-      {
-        title: "Toplam Borç",
-        value: formatCurrency(totalDebt, settings.currencyCode),
-      },
-      {
-        title: "Aktif Borç",
-        value: `${activeDebtCount}`,
-      },
-      {
-        title: "Kapanan Borç",
-        value: `${closedDebtCount}`,
-      },
-      {
-        title: "Bu Ay Ödeme",
-        value: formatCurrency(thisMonthPaymentAmount, settings.currencyCode),
-      },
-    ],
-    [
-      activeDebtCount,
-      closedDebtCount,
-      currentCash,
-      settings.currencyCode,
-      thisMonthPaymentAmount,
-      totalDebt,
-    ],
   );
 
   const { items: upcomingPaymentItems, summary: upcomingPaymentSummary } =
@@ -467,101 +402,38 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       }),
     [debts, last30DaysPaymentAmount, thisMonthPaymentAmount],
   );
-  const parsedPlannerBudget = useMemo(
-    () => parsePayoffExtraBudget(plannerExtraBudget),
-    [plannerExtraBudget],
+  const minimumPaymentTotal = monthlyPerformance.totalMinimumPaymentLoad;
+  const safeSpendableBalance = useMemo(
+    () => roundCurrency(currentCash - minimumPaymentTotal),
+    [currentCash, minimumPaymentTotal],
   );
-  const payoffScenario = useMemo(
-    () =>
-      buildPayoffScenario({
-        debts,
-        currentCash,
-        strategy: selectedPayoffStrategy,
-        extraBudget: parsedPlannerBudget.value,
-      }),
-    [currentCash, debts, parsedPlannerBudget.value, selectedPayoffStrategy],
-  );
-  const operationsSummary = useMemo(
-    () =>
-      buildOperationsOverviewSummary({
-        debts,
-        cashList,
-        payments,
-        upcomingPaymentCount: upcomingPaymentItems.length,
-        cashRisk: cashRiskSummary,
-      }),
-    [cashList, cashRiskSummary, debts, payments, upcomingPaymentItems.length],
-  );
-  const dataHealth = useMemo(
-    () =>
-      buildDataHealthSummary({
-        debts,
-        cashList,
-        payments,
-      }),
-    [cashList, debts, payments],
-  );
-  const recommendedActions = useMemo(
-    () =>
-      buildRecommendedActions({
-        health: dataHealth,
-        cashRisk: cashRiskSummary,
-        upcomingUrgentCount: upcomingPaymentSummary.urgentCount,
-        closedDebtCount,
-      }),
-    [cashRiskSummary, closedDebtCount, dataHealth, upcomingPaymentSummary.urgentCount],
-  );
-
-  const dashboardTrends: DashboardTrendItem[] = useMemo(() => {
-    const now = new Date();
-    const last7Days = new Date(now);
-    const thisMonthDebtCount = debts.filter((item) => {
-      const date = new Date(item.created_at);
-      return (
-        !Number.isNaN(date.getTime()) &&
-        date.getFullYear() === now.getFullYear() &&
-        date.getMonth() === now.getMonth()
-      );
-    }).length;
-
-    const thisMonthCashCount = cashList.filter((item) => {
-      const date = new Date(item.created_at);
-      return (
-        !Number.isNaN(date.getTime()) &&
-        date.getFullYear() === now.getFullYear() &&
-        date.getMonth() === now.getMonth()
-      );
-    }).length;
-
-    last7Days.setDate(now.getDate() - 7);
-    const paymentCountLast7Days = payments.filter((item) => {
-      const date = new Date(item.created_at);
-      return !Number.isNaN(date.getTime()) && date >= last7Days;
-    }).length;
-
-    return [
+  const summaryCards: SummaryCard[] = useMemo(
+    () => [
       {
-        label: "Son 30 Gün Ödeme",
-        value: formatCurrency(last30DaysPaymentAmount, settings.currencyCode),
-        description: "Yakın dönem ödeme hacmi",
+        title: "Toplam Nakit",
+        value: formatCurrency(currentCash, settings.currencyCode),
       },
       {
-        label: "Bu Ay Yeni Borç",
-        value: `${thisMonthDebtCount}`,
-        description: "Eklenen borç kaydı",
+        title: "Toplam Borç",
+        value: formatCurrency(totalDebt, settings.currencyCode),
       },
       {
-        label: "Bu Ay Yeni Kasa",
-        value: `${thisMonthCashCount}`,
-        description: "Eklenen kasa kaydı",
+        title: "Minimum Ödeme Toplamı",
+        value: formatCurrency(minimumPaymentTotal, settings.currencyCode),
       },
       {
-        label: "Son 7 Gün Ödeme",
-        value: `${paymentCountLast7Days}`,
-        description: "Yakın dönem ödeme adedi",
+        title: "Harcanabilir Güvenli Bakiye",
+        value: formatCurrency(safeSpendableBalance, settings.currencyCode),
       },
-    ];
-  }, [cashList, debts, last30DaysPaymentAmount, payments, settings.currencyCode]);
+    ],
+    [
+      currentCash,
+      minimumPaymentTotal,
+      safeSpendableBalance,
+      settings.currencyCode,
+      totalDebt,
+    ],
+  );
 
   const displayDebtTableData = useMemo(
     () =>
@@ -642,14 +514,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       )
       .slice(0, 12);
   }, [derivedActivities, runtimeActivities]);
-
-  const isOnboardingEmpty =
-    !loadingCash &&
-    !loadingDebts &&
-    !loadingPayments &&
-    cashList.length === 0 &&
-    debts.length === 0 &&
-    payments.length === 0;
 
   const handleExportCash = () => {
     try {
@@ -918,7 +782,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       setAuthEmail("");
       setPendingBackup(null);
       setBackupPreview(null);
-      setLastSyncedAt(null);
       showAuthMessage("Oturum kapatıldı.", "success");
     } catch (error) {
       console.error("Auth çıkış hatası:", error);
@@ -995,49 +858,55 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
           <>
             <SummaryCards cards={summaryCards} />
 
-            {!isOnboardingEmpty && <DashboardTrends items={dashboardTrends} />}
+            <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Hızlı Aksiyonlar
+                </h3>
+                <p className="text-sm text-gray-500">
+                  Yönetim işlemlerine ilgili sayfalardan doğrudan geçin.
+                </p>
+              </div>
 
-            <OperationsOverview
-              summary={operationsSummary}
-              health={dataHealth}
-              recommendedActions={recommendedActions}
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/debts"
+                  className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                >
+                  Borç Ekle
+                </Link>
+                <Link
+                  href="/payments"
+                  className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+                >
+                  Ödeme Yap
+                </Link>
+                <Link
+                  href="/cash"
+                  className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+                >
+                  Kasa Ekle
+                </Link>
+              </div>
+            </section>
+
+            <RiskOverview
+              priorities={debtPriorities}
+              cashRisk={cashRiskSummary}
+              performance={monthlyPerformance}
               currencyCode={settings.currencyCode}
-              lastSyncedAt={lastSyncedAt}
             />
 
-            {isOnboardingEmpty ? (
-              <OnboardingEmptyState email={session.user.email || null} />
-            ) : (
-              <>
-                <RiskOverview
-                  priorities={debtPriorities}
-                  cashRisk={cashRiskSummary}
-                  performance={monthlyPerformance}
-                  currencyCode={settings.currencyCode}
-                />
+            <UpcomingPayments
+              items={upcomingPaymentItems.slice(0, 5)}
+              summary={upcomingPaymentSummary}
+              currencyCode={settings.currencyCode}
+            />
 
-                <PayoffPlanner
-                  strategy={selectedPayoffStrategy}
-                  extraBudget={plannerExtraBudget}
-                  onStrategyChange={setSelectedPayoffStrategy}
-                  onExtraBudgetChange={setPlannerExtraBudget}
-                  scenario={payoffScenario}
-                  validationError={parsedPlannerBudget.error}
-                  currencyCode={settings.currencyCode}
-                />
-
-                <UpcomingPayments
-                  items={upcomingPaymentItems}
-                  summary={upcomingPaymentSummary}
-                  currencyCode={settings.currencyCode}
-                />
-
-                <RecentActivity
-                  activities={recentActivities}
-                  currencyCode={settings.currencyCode}
-                />
-              </>
-            )}
+            <RecentActivity
+              activities={recentActivities.slice(0, 5)}
+              currencyCode={settings.currencyCode}
+            />
           </>
         )}
 
