@@ -39,25 +39,21 @@ export async function addCashItem(
   let query = supabase
     .from("cash")
     .select("*")
-    .eq("name", payload.name)
-    .eq("balance", payload.balance)
     .order("id", { ascending: false })
     .limit(1);
 
-  if (payload.note === null) {
-    query = query.is("note", null);
-  } else {
-    query = query.eq("note", payload.note);
-  }
-
   if (options.userId) {
     query = query.eq("user_id", options.userId);
+  } else {
+    query = query.eq("name", payload.name);
   }
 
   const { data: insertedCash, error: fetchError } = await query.maybeSingle();
 
   if (fetchError) {
-    throw fetchError;
+    throw new Error(
+      `Kasa kaydı eklendi ancak yeni kayıt okunamadı: ${fetchError.message}`,
+    );
   }
 
   if (!insertedCash) {

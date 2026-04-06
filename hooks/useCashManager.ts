@@ -172,10 +172,20 @@ export function useCashManager({
     } catch (error) {
       if (isEditingCash && editingCashId !== null) {
         console.error("Cash guncelleme hatasi:", error);
-        onMessage("Kasa güncellenemedi.", "error");
+        onMessage(
+          error instanceof Error
+            ? `Kasa güncellenemedi: ${error.message}`
+            : "Kasa güncellenemedi.",
+          "error",
+        );
       } else {
         console.error("Cash ekleme hatası:", error);
-        onMessage("Kasa eklenemedi.", "error");
+        onMessage(
+          error instanceof Error
+            ? `Kasa eklenemedi: ${error.message}`
+            : "Kasa eklenemedi.",
+          "error",
+        );
       }
     } finally {
       setAddingCash(false);
