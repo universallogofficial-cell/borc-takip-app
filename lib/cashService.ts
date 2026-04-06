@@ -30,17 +30,41 @@ export async function addCashItem(
   const insertPayload = options.userId
     ? [{ ...payload, user_id: options.userId }]
     : [payload];
-  const { data, error } = await supabase
-    .from("cash")
-    .insert(insertPayload)
-    .select("*")
-    .single();
+  const { error } = await supabase.from("cash").insert(insertPayload);
 
   if (error) {
     throw error;
   }
 
-  return data as CashItem;
+  let query = supabase
+    .from("cash")
+    .select("*")
+    .eq("name", payload.name)
+    .eq("balance", payload.balance)
+    .order("id", { ascending: false })
+    .limit(1);
+
+  if (payload.note === null) {
+    query = query.is("note", null);
+  } else {
+    query = query.eq("note", payload.note);
+  }
+
+  if (options.userId) {
+    query = query.eq("user_id", options.userId);
+  }
+
+  const { data: insertedCash, error: fetchError } = await query.maybeSingle();
+
+  if (fetchError) {
+    throw fetchError;
+  }
+
+  if (!insertedCash) {
+    throw new Error("Kasa kaydı eklendi ancak yeni kayıt doğrulanamadı.");
+  }
+
+  return insertedCash as CashItem;
 }
 
 export async function updateCashItem(
