@@ -30,9 +30,19 @@ export async function addCashItem(
   const insertPayload = options.userId
     ? [{ ...payload, user_id: options.userId }]
     : [payload];
+  console.info("cashService.addCashItem insert payload", {
+    insertPayload,
+    userId: options.userId ?? null,
+  });
   const { error } = await supabase.from("cash").insert(insertPayload);
 
   if (error) {
+    console.error("cashService.addCashItem insert error", {
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+      code: error.code,
+    });
     throw error;
   }
 
@@ -51,6 +61,12 @@ export async function addCashItem(
   const { data: insertedCash, error: fetchError } = await query.maybeSingle();
 
   if (fetchError) {
+    console.error("cashService.addCashItem fetch error", {
+      message: fetchError.message,
+      details: fetchError.details,
+      hint: fetchError.hint,
+      code: fetchError.code,
+    });
     throw new Error(
       `Kasa kaydı eklendi ancak yeni kayıt okunamadı: ${fetchError.message}`,
     );
