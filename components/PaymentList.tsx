@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatCurrency, formatDateTime } from "@/lib/formatCurrency";
 import type { CurrencyCode, PaymentFilter, PaymentListRow } from "@/types/finance";
 
@@ -126,41 +127,124 @@ export default function PaymentList({
         </div>
       </div>
 
-      <div className="mb-4 grid gap-3 md:grid-cols-3">
-        <input
-          type="text"
-          value={paymentSearch}
-          onChange={(e) => onChangePaymentSearch(e.target.value)}
-          placeholder="Borç, kasa veya not ara"
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
-        />
-        <input
-          type="number"
-          step="0.01"
-          value={paymentMinAmount}
-          onChange={(e) => onChangePaymentMinAmount(e.target.value)}
-          placeholder="Min tutar"
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
-        />
-        <input
-          type="number"
-          step="0.01"
-          value={paymentMaxAmount}
-          onChange={(e) => onChangePaymentMaxAmount(e.target.value)}
-          placeholder="Max tutar"
-          className="rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
-        />
+      <div className="mb-4 rounded-2xl bg-gray-50 p-4">
+        <div className="mb-3">
+          <p className="text-sm font-medium text-gray-900">Filtreler</p>
+          <p className="text-sm text-gray-500">
+            Tarih, metin ve tutar aralığı ile ödeme listesini daraltın.
+          </p>
+        </div>
+
+        <div className="mb-3 flex flex-wrap gap-2">
+          {paymentFilters.map((filter) => (
+            <button
+              key={filter.value}
+              type="button"
+              onClick={() => onChangeFilter(filter.value)}
+              className={`rounded-lg px-3 py-1.5 text-sm transition ${
+                selectedFilter === filter.value
+                  ? "bg-gray-900 text-white"
+                  : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
+              }`}
+            >
+              {filter.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-3">
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+              Arama
+            </label>
+            <input
+              type="text"
+              value={paymentSearch}
+              onChange={(e) => onChangePaymentSearch(e.target.value)}
+              placeholder="Borç, kasa veya not ara"
+              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+              Minimum tutar
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              value={paymentMinAmount}
+              onChange={(e) => onChangePaymentMinAmount(e.target.value)}
+              placeholder="Örn: 500"
+              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+              Maksimum tutar
+            </label>
+            <input
+              type="number"
+              step="0.01"
+              value={paymentMaxAmount}
+              onChange={(e) => onChangePaymentMaxAmount(e.target.value)}
+              placeholder="Örn: 5000"
+              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+            />
+          </div>
+        </div>
       </div>
 
       {loadingPayments ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-          Ödeme verisi yükleniyor...
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <div className="mb-4">
+            <p className="text-sm font-medium text-gray-900">
+              Ödeme kayıtları hazırlanıyor
+            </p>
+            <p className="text-sm text-gray-500">
+              Filtreler ve son hareketler yükleniyor. Liste kısa süre içinde görünecek.
+            </p>
+          </div>
+          <div className="space-y-3">
+            <div className="h-20 animate-pulse rounded-xl bg-gray-200" />
+            <div className="h-20 animate-pulse rounded-xl bg-gray-200" />
+            <div className="h-20 animate-pulse rounded-xl bg-gray-200" />
+          </div>
         </div>
       ) : payments.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-          {hasAnyPayments
-            ? "Seçili filtreler için ödeme kaydı yok."
-            : "Henüz ödeme kaydı bulunmuyor."}
+        <div className="rounded-2xl border border-dashed border-gray-300 p-6 text-center">
+          <p className="text-sm font-medium text-gray-900">
+            {hasAnyPayments
+              ? "Seçili filtreler için ödeme kaydı yok."
+              : "Henüz ödeme kaydı bulunmuyor."}
+          </p>
+          <p className="mt-2 text-sm text-gray-500">
+            {hasAnyPayments
+              ? "Filtreleri sadeleştirin veya yeni ödeme kaydı oluşturun."
+              : "İlk ödeme kaydını ekleyerek hareket geçmişini oluşturmaya başlayın."}
+          </p>
+          <div className="mt-4 flex flex-wrap justify-center gap-3">
+            {hasAnyPayments && (
+              <button
+                type="button"
+                onClick={() => {
+                  onChangeFilter("all");
+                  onChangePaymentSearch("");
+                  onChangePaymentMinAmount("");
+                  onChangePaymentMaxAmount("");
+                }}
+                className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+              >
+                Filtreleri Temizle
+              </button>
+            )}
+            <Link
+              href="/payments"
+              onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+            >
+              Yeni Ödeme Yap
+            </Link>
+          </div>
         </div>
       ) : (
         <div className="space-y-3">

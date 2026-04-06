@@ -189,13 +189,19 @@ export type DebtPriorityItem = {
   dueDay: number | null;
   score: number;
   reasons: string[];
+  summary: string;
 };
 
 export type CashRiskSummary = {
   currentCash: number;
   nearTermObligation: number;
+  monthlyMinimumLoad: number;
+  safeSpendableBalance: number;
+  coverageRatio: number;
   isInsufficient: boolean;
   gap: number;
+  statusLabel: string;
+  summaryText: string;
   warnings: string[];
 };
 
@@ -222,6 +228,7 @@ export type PayoffPlannerItem = {
   dueDay: number | null;
   suggestedExtraPayment: number;
   reason: string;
+  drivers: string[];
 };
 
 export type PayoffScenario = {

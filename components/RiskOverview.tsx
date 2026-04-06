@@ -19,38 +19,92 @@ export default function RiskOverview({
   performance,
   currencyCode,
 }: RiskOverviewProps) {
+  const riskTone = cashRisk.isInsufficient
+    ? "border-red-200 bg-red-50 text-red-800"
+    : cashRisk.safeSpendableBalance < 0 || cashRisk.warnings.length > 0
+      ? "border-amber-200 bg-amber-50 text-amber-800"
+      : "border-emerald-200 bg-emerald-50 text-emerald-800";
+
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-      <div className="mb-4">
-        <h3 className="text-lg font-semibold text-gray-900">
+    <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+      <div className="mb-5">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+          Risk Merkezi
+        </p>
+        <h3 className="mt-2 text-xl font-semibold text-gray-900">
           Risk ve Öncelik
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="mt-2 text-sm leading-6 text-gray-500">
           Nakit riski, ödeme önceliği ve aylık performans tek alanda izlenir.
         </p>
       </div>
 
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-xl bg-gray-50 p-4">
-          <p className="text-sm text-gray-500">Yakın Dönem Yükümlülük</p>
-            <p className="mt-1 font-semibold text-gray-900">
+      <div className={`mb-5 rounded-[24px] border p-4 md:p-5 ${riskTone}`}>
+        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <div className="min-w-0">
+            <p className="text-xs font-semibold uppercase tracking-wide opacity-80">
+              Risk Durumu
+            </p>
+            <p className="mt-1 text-xl font-semibold">{cashRisk.statusLabel}</p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 opacity-90">
+              {cashRisk.summaryText}
+            </p>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-3 md:min-w-[360px]">
+            <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+              <p className="text-xs uppercase tracking-wide opacity-70">Mevcut Nakit</p>
+              <p className="mt-1 font-semibold">
+                {formatCurrency(cashRisk.currentCash, currencyCode)}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+              <p className="text-xs uppercase tracking-wide opacity-70">Yakın Dönem</p>
+              <p className="mt-1 font-semibold">
+                {formatCurrency(cashRisk.nearTermObligation, currencyCode)}
+              </p>
+            </div>
+            <div className="rounded-2xl bg-white/70 p-3 ring-1 ring-black/5">
+              <p className="text-xs uppercase tracking-wide opacity-70">Güvenli Bakiye</p>
+              <p className="mt-1 font-semibold">
+                {formatCurrency(cashRisk.safeSpendableBalance, currencyCode)}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Yakın Dönem Yükümlülük
+          </p>
+          <p className="mt-2 text-lg font-semibold text-gray-900">
             {formatCurrency(cashRisk.nearTermObligation, currencyCode)}
           </p>
           <p className="mt-1 text-sm text-gray-500">
             Mevcut nakit: {formatCurrency(cashRisk.currentCash, currencyCode)}
           </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Kapsama oranı: %{Math.round(cashRisk.coverageRatio * 100)}
+          </p>
         </div>
 
-        <div className="rounded-xl bg-gray-50 p-4">
-          <p className="text-sm text-gray-500">Nakit Durumu</p>
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Minimum Ödeme ve Güvenli Alan
+          </p>
           <p
-            className={`mt-1 font-semibold ${
-              cashRisk.isInsufficient ? "text-red-600" : "text-emerald-700"
+            className={`mt-2 text-lg font-semibold ${
+              cashRisk.safeSpendableBalance < 0 ? "text-red-600" : "text-emerald-700"
             }`}
           >
-            {cashRisk.isInsufficient
-              ? `${formatCurrency(Math.abs(cashRisk.gap), currencyCode)} eksik`
-              : `${formatCurrency(cashRisk.gap, currencyCode)} tampon`}
+            {cashRisk.safeSpendableBalance < 0
+              ? `${formatCurrency(Math.abs(cashRisk.safeSpendableBalance), currencyCode)} açık`
+              : `${formatCurrency(cashRisk.safeSpendableBalance, currencyCode)} serbest alan`}
+          </p>
+          <p className="mt-1 text-sm text-gray-500">
+            Toplam minimum ödeme:{" "}
+            {formatCurrency(cashRisk.monthlyMinimumLoad, currencyCode)}
           </p>
           <div className="mt-2 flex flex-wrap gap-2">
             {cashRisk.warnings.length === 0 ? (
@@ -70,11 +124,17 @@ export default function RiskOverview({
           </div>
         </div>
 
-        <div className="rounded-xl bg-gray-50 p-4">
-          <p className="text-sm text-gray-500">Aylık Performans</p>
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Aylık Performans
+          </p>
           <div className="mt-1 space-y-1 text-sm text-gray-700">
-            <p>Bu ay ödeme: {formatCurrency(performance.thisMonthPaymentTotal, currencyCode)}</p>
-            <p>Son 30 gün: {formatCurrency(performance.last30DaysPaymentTotal, currencyCode)}</p>
+            <p>
+              Bu ay ödeme: {formatCurrency(performance.thisMonthPaymentTotal, currencyCode)}
+            </p>
+            <p>
+              Son 30 gün: {formatCurrency(performance.last30DaysPaymentTotal, currencyCode)}
+            </p>
             <p>Aktif borç: {performance.activeDebtCount}</p>
             <p>Kapanan borç: {performance.closedDebtCount}</p>
             <p>
@@ -95,19 +155,25 @@ export default function RiskOverview({
           </div>
         ) : (
           <div className="space-y-3">
-            {priorities.map((item) => (
+            {priorities.map((item, index) => (
               <div
                 key={item.id}
-                className="rounded-xl border border-gray-200 p-4"
+                className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
-                    <p className="break-words font-medium text-gray-900">
-                      {item.debtName}
-                    </p>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white">
+                        #{index + 1}
+                      </span>
+                      <p className="break-words font-semibold text-gray-900">
+                        {item.debtName}
+                      </p>
+                    </div>
                     <p className="break-words text-sm text-gray-500">
                       {item.institution}
                     </p>
+                    <p className="mt-2 text-sm leading-6 text-gray-600">{item.summary}</p>
                     <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
                       <span>
                         Kalan borç: {formatCurrency(item.remainingDebt, currencyCode)}
@@ -125,7 +191,7 @@ export default function RiskOverview({
                     {item.reasons.map((reason) => (
                       <span
                         key={reason}
-                        className="rounded-full bg-amber-100 px-2 py-1 text-xs font-medium text-amber-800"
+                        className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800"
                       >
                         {reason}
                       </span>

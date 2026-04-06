@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { CashItem, CurrencyCode } from "@/types/finance";
 import { formatCurrency } from "@/lib/formatCurrency";
 
@@ -29,19 +30,24 @@ export default function CashPanel({
             Kasa bakiyelerini arayın, dışa aktarın ve düzenleyin.
           </p>
         </div>
-        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
-          <input
-            type="text"
-            value={cashSearch}
-            onChange={(e) => onCashSearchChange(e.target.value)}
-            placeholder="Kasa ara"
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 sm:min-w-56"
-          />
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
+          <div className="w-full sm:min-w-72">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+              Arama
+            </label>
+            <input
+              type="text"
+              value={cashSearch}
+              onChange={(e) => onCashSearchChange(e.target.value)}
+              placeholder="Kasa adı veya not ara"
+              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+            />
+          </div>
           <button
             type="button"
             onClick={onExportCash}
             disabled={cashList.length === 0}
-            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:self-end"
           >
             CSV Dışa Aktar
           </button>
@@ -57,10 +63,35 @@ export default function CashPanel({
 
       <div className="space-y-3">
         {cashList.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
-            {cashSearch.trim()
-              ? "Aramanıza uygun kasa kaydı yok."
-              : "Henüz kasa kaydı bulunmuyor."}
+          <div className="rounded-2xl border border-dashed border-gray-300 p-6 text-center">
+            <p className="text-sm font-medium text-gray-900">
+              {cashSearch.trim()
+                ? "Aramanıza uygun kasa kaydı yok."
+                : "Henüz kasa kaydı bulunmuyor."}
+            </p>
+            <p className="mt-2 text-sm text-gray-500">
+              {cashSearch.trim()
+                ? "Arama ifadesini temizleyin veya yeni kasa oluşturun."
+                : "İlk kasa kaydını oluşturarak ödeme akışını başlatın."}
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-3">
+              {cashSearch.trim() && (
+                <button
+                  type="button"
+                  onClick={() => onCashSearchChange("")}
+                  className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+                >
+                  Aramayı Temizle
+                </button>
+              )}
+              <Link
+                href="/cash"
+                onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+              >
+                Yeni Kasa Ekle
+              </Link>
+            </div>
           </div>
         ) : (
           cashList.map((cash) => (

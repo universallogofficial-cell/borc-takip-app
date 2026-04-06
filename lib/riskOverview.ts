@@ -30,6 +30,22 @@ function getDueUrgencyScore(dueDay: number | null, todayDay: number) {
   return 10;
 }
 
+function buildPrioritySummary(reasons: string[]) {
+  if (reasons.length === 0) {
+    return "Mevcut ödeme baskısına göre izlenmesi gereken borç.";
+  }
+
+  if (reasons.length === 1) {
+    return `${reasons[0]} nedeniyle öne çıkıyor.`;
+  }
+
+  if (reasons.length === 2) {
+    return `${reasons[0]} ve ${reasons[1]} nedeniyle öne çıkıyor.`;
+  }
+
+  return `${reasons[0]}, ${reasons[1]} ve ${reasons[2]} nedeniyle öncelikli.`;
+}
+
 export function buildDebtPriorityItems(debts: DebtRow[]): DebtPriorityItem[] {
   const todayDay = new Date().getDate();
   const activeDebts = debts.filter((item) => toSafeNumber(item.remaining_debt) > 0);
@@ -88,6 +104,7 @@ export function buildDebtPriorityItems(debts: DebtRow[]): DebtPriorityItem[] {
         dueDay,
         score,
         reasons: reasons.slice(0, 3),
+        summary: buildPrioritySummary(reasons.slice(0, 3)),
       };
     })
     .sort((a, b) => b.score - a.score || b.remainingDebt - a.remainingDebt)
@@ -99,6 +116,18 @@ export function buildCashRiskSummary(
   currentCash: number,
 ): CashRiskSummary {
   const todayDay = new Date().getDate();
+  const monthlyMinimumLoad = roundCurrency(
+    debts.reduce((sum, item) => {
+      const remainingDebt = roundCurrency(toSafeNumber(item.remaining_debt));
+      const minimumPayment = roundCurrency(toSafeNumber(item.minimum_payment));
+
+      if (remainingDebt <= 0 || minimumPayment <= 0) {
+        return sum;
+      }
+
+      return roundCurrency(sum + minimumPayment);
+    }, 0),
+  );
   const nearTermObligation = roundCurrency(
     debts.reduce((sum, item) => {
       const remainingDebt = roundCurrency(toSafeNumber(item.remaining_debt));
@@ -125,7 +154,12 @@ export function buildCashRiskSummary(
   );
 
   const gap = roundCurrency(currentCash - nearTermObligation);
+  const safeSpendableBalance = roundCurrency(currentCash - monthlyMinimumLoad);
   const isInsufficient = gap < 0;
+  const coverageRatio =
+    nearTermObligation <= 0
+      ? 1
+      : roundCurrency(currentCash / nearTermObligation);
   const urgentDebtCount = debts.filter((item) => {
     const remainingDebt = roundCurrency(toSafeNumber(item.remaining_debt));
     const dueDay = item.due_day;
@@ -147,11 +181,39 @@ export function buildCashRiskSummary(
     warnings.push("Bu ay çok sayıda yaklaşan ödeme");
   }
 
+  let statusLabel = "Dengeli";
+  let summaryText =
+    "Nakit görünümü mevcut minimum ödeme yükü ile uyumlu görünüyor.";
+
+  if (currentCash <= 0 && monthlyMinimumLoad > 0) {
+    statusLabel = "Kritik";
+    summaryText =
+      "Mevcut nakit görünmüyor. Minimum ödeme yükü için kısa vadede kaynak planı gerekiyor.";
+  } else if (isInsufficient) {
+    statusLabel = "Riskli";
+    summaryText = `Yakın dönem ödemeleri karşılamak için ${roundCurrency(
+      Math.abs(gap),
+    )} ek nakit gerekiyor.`;
+  } else if (safeSpendableBalance < 0) {
+    statusLabel = "Sıkışık";
+    summaryText =
+      "Yakın dönem ödemeleri karşılayabiliyorsunuz ancak aylık minimum ödeme yükü mevcut nakdi zorluyor.";
+  } else if (urgentDebtCount >= 3) {
+    statusLabel = "Dikkat";
+    summaryText =
+      "Birden fazla yaklaşan ödeme var. Nakit yeterli olsa da önceliklendirme önemli.";
+  }
+
   return {
     currentCash: roundCurrency(currentCash),
     nearTermObligation,
+    monthlyMinimumLoad,
+    safeSpendableBalance,
+    coverageRatio,
     isInsufficient,
     gap,
+    statusLabel,
+    summaryText,
     warnings,
   };
 }

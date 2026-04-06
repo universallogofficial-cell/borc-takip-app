@@ -25,85 +25,152 @@ export default function PayoffPlanner({
   validationError,
   currencyCode,
 }: PayoffPlannerProps) {
+  const leadRecommendation = scenario.recommendations[0] ?? null;
+
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
-            Ödeme Stratejisi / Planlama
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+            Borç Kapatma Stratejisi
+          </p>
+          <h3 className="mt-2 text-xl font-semibold text-gray-900">
+            Öncelikli borcu netleştirin
           </h3>
-          <p className="text-sm text-gray-500">
-            Bu alan yalnızca öneri üretir, otomatik ödeme işlemi başlatmaz.
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
+            Seçilen stratejiye göre önce hangi borcu düşünmeniz gerektiğini görün.
+            Bu alan yalnızca karar desteği sunar, otomatik ödeme işlemi başlatmaz.
           </p>
         </div>
-        <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-medium text-sky-800">
+        <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-800">
           {scenario.strategyTag}
         </span>
       </div>
 
-      <div className="mb-4 grid gap-3 md:grid-cols-2">
-        <div>
-          <label className="mb-1 block text-sm text-gray-600">Strateji</label>
-          <select
-            value={strategy}
-            onChange={(e) => onStrategyChange(e.target.value as PayoffStrategy)}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
-          >
-            {payoffStrategyOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+      <div className="mb-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+          <div className="grid gap-3 md:grid-cols-2">
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Strateji
+              </label>
+              <select
+                value={strategy}
+                onChange={(e) => onStrategyChange(e.target.value as PayoffStrategy)}
+                className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+              >
+                {payoffStrategyOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
+                Ek Ödeme Bütçesi
+              </label>
+              <input
+                type="number"
+                step="0.01"
+                min="0"
+                value={extraBudget}
+                onChange={(e) => onExtraBudgetChange(e.target.value)}
+                placeholder="Örn: 1000"
+                className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+              />
+            </div>
+          </div>
+
+          {validationError && (
+            <div className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {validationError}
+            </div>
+          )}
+
+          <div className="mt-4 rounded-2xl bg-white p-4 ring-1 ring-gray-200">
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Plan Yorumu
+            </p>
+            <p className="mt-2 text-sm font-medium text-gray-900">
+              {scenario.strategyLabel}
+            </p>
+            <p className="mt-2 text-sm leading-6 text-gray-600">
+              {scenario.summaryNote}
+            </p>
+          </div>
         </div>
 
-        <div>
-          <label className="mb-1 block text-sm text-gray-600">
-            Ek Ödeme Bütçesi
-          </label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            value={extraBudget}
-            onChange={(e) => onExtraBudgetChange(e.target.value)}
-            placeholder="Örn: 1000"
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
-          />
+        <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 text-white shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+            Önce Değerlendirin
+          </p>
+          {leadRecommendation ? (
+            <>
+              <p className="mt-3 text-lg font-semibold">{leadRecommendation.debtName}</p>
+              <p className="mt-1 text-sm text-slate-300">{leadRecommendation.institution}</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl bg-white/10 p-3">
+                  <p className="text-xs uppercase tracking-wide text-slate-300">Kalan Borç</p>
+                  <p className="mt-1 text-base font-semibold">
+                    {formatCurrency(leadRecommendation.remainingDebt, currencyCode)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white/10 p-3">
+                  <p className="text-xs uppercase tracking-wide text-slate-300">Önerilen Ek</p>
+                  <p className="mt-1 text-base font-semibold">
+                    {formatCurrency(leadRecommendation.suggestedExtraPayment, currencyCode)}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-4 text-sm leading-6 text-slate-200">
+                {leadRecommendation.reason}
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {leadRecommendation.drivers.map((driver) => (
+                  <span
+                    key={driver}
+                    className="rounded-full bg-white/10 px-2.5 py-1 text-xs font-medium text-slate-100 ring-1 ring-white/10"
+                  >
+                    {driver}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : (
+            <p className="mt-3 text-sm text-slate-300">
+              Aktif borç oluştuğunda en baskılı kayıt burada öne çıkar.
+            </p>
+          )}
         </div>
       </div>
 
-      {validationError && (
-        <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          {validationError}
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Strateji</p>
+          <p className="mt-2 font-semibold text-gray-900">{scenario.strategyLabel}</p>
         </div>
-      )}
-
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Strateji</p>
-          <p className="font-semibold text-gray-900">{scenario.strategyLabel}</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Aktif Borç</p>
+          <p className="mt-2 text-2xl font-semibold text-gray-900">{scenario.activeDebtCount}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Aktif Borç</p>
-          <p className="font-semibold text-gray-900">{scenario.activeDebtCount}</p>
-        </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Minimum Yük</p>
-            <p className="font-semibold text-gray-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Minimum Yük</p>
+          <p className="mt-2 font-semibold text-gray-900">
             {formatCurrency(scenario.minimumPaymentLoad, currencyCode)}
           </p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Toplam Plan İhtiyacı</p>
-            <p className="font-semibold text-gray-900">
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Plan İhtiyacı</p>
+          <p className="mt-2 font-semibold text-gray-900">
             {formatCurrency(scenario.totalRequiredCash, currencyCode)}
           </p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Uygulanabilirlik</p>
+        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+          <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Uygulanabilirlik</p>
           <p
-            className={`font-semibold ${
+            className={`mt-2 font-semibold ${
               scenario.canCoverPlan
                 ? "text-emerald-700"
                 : scenario.canCoverMinimums
@@ -116,18 +183,37 @@ export default function PayoffPlanner({
         </div>
       </div>
 
-      <div className="mb-4 rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
-        <p>Mevcut nakit: {formatCurrency(scenario.currentCash, currencyCode)}</p>
-        <p>Ek ödeme bütçesi: {formatCurrency(scenario.extraBudget, currencyCode)}</p>
-        <p>
-          Minimum ödemeler sonrası kalan nakit:{" "}
-          {formatCurrency(scenario.availableAfterMinimums, currencyCode)}
-        </p>
-        <p className="mt-2">{scenario.summaryNote}</p>
+      <div className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Mevcut Nakit
+            </p>
+            <p className="mt-1 font-semibold text-gray-900">
+              {formatCurrency(scenario.currentCash, currencyCode)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Ek Bütçe
+            </p>
+            <p className="mt-1 font-semibold text-gray-900">
+              {formatCurrency(scenario.extraBudget, currencyCode)}
+            </p>
+          </div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+              Minimumler Sonrası
+            </p>
+            <p className="mt-1 font-semibold text-gray-900">
+              {formatCurrency(scenario.availableAfterMinimums, currencyCode)}
+            </p>
+          </div>
+        </div>
       </div>
 
       {scenario.recommendations.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+        <div className="rounded-2xl border border-dashed border-gray-300 p-5 text-sm text-gray-500">
           Planlanacak aktif borç kaydı yok.
         </div>
       ) : (
@@ -135,30 +221,47 @@ export default function PayoffPlanner({
           {scenario.recommendations.map((item, index) => (
             <div
               key={item.id}
-              className="rounded-xl border border-gray-200 p-4"
+              className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
-                  <p className="break-words font-medium text-gray-900">
-                    {index + 1}. {item.debtName}
-                  </p>
-                  <p className="break-words text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white">
+                      #{index + 1}
+                    </span>
+                    <p className="break-words font-semibold text-gray-900">
+                      {item.debtName}
+                    </p>
+                  </div>
+                  <p className="mt-1 break-words text-sm text-gray-500">
                     {item.institution}
                   </p>
-                  <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
+                  <div className="mt-3 flex flex-wrap gap-x-4 gap-y-2 text-sm text-gray-600">
                     <span>Kalan: {formatCurrency(item.remainingDebt, currencyCode)}</span>
                     <span>Min: {formatCurrency(item.minimumPayment, currencyCode)}</span>
                     <span>Faiz: %{item.rate || 0}</span>
                     <span>Vade: {item.dueDay ?? "-"}</span>
                   </div>
-                  <p className="mt-2 break-words text-sm text-gray-600">
+                  <p className="mt-3 break-words text-sm leading-6 text-gray-600">
                     {item.reason}
                   </p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {item.drivers.map((driver) => (
+                      <span
+                        key={driver}
+                        className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800"
+                      >
+                        {driver}
+                      </span>
+                    ))}
+                  </div>
                 </div>
 
-                <div className="text-left sm:text-right">
-                  <p className="text-sm text-gray-500">Önerilen ek ödeme</p>
-                  <p className="font-semibold text-gray-900">
+                <div className="min-w-40 rounded-2xl bg-gray-50 p-4 text-left sm:text-right">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    Önerilen Ek Ödeme
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-gray-900">
                     {formatCurrency(item.suggestedExtraPayment, currencyCode)}
                   </p>
                 </div>

@@ -82,6 +82,38 @@ function compareByStrategy(a: RankedDebt, b: RankedDebt, strategy: PayoffStrateg
   );
 }
 
+function buildDrivers(
+  item: RankedDebt,
+  strategy: PayoffStrategy,
+  todayDay: number,
+) {
+  const drivers: string[] = [];
+
+  if (item.dueDay === todayDay) {
+    drivers.push("bugün vade");
+  } else if (item.dueDay !== null && item.dueDistance <= 3) {
+    drivers.push("vade çok yakın");
+  } else if (item.dueDay !== null && item.dueDistance <= 7) {
+    drivers.push("yaklaşan vade");
+  }
+
+  if (item.rate >= 4) {
+    drivers.push("faiz baskısı");
+  }
+
+  if (item.minimumPayment > 0) {
+    drivers.push("minimum ödeme yükü");
+  }
+
+  if (strategy === "smallest_balance") {
+    drivers.push("hızlı kapanış fırsatı");
+  } else if (item.remainingDebt >= item.minimumPayment * 12 && item.minimumPayment > 0) {
+    drivers.push("yüksek ana para");
+  }
+
+  return drivers.slice(0, 3);
+}
+
 function buildReason(item: RankedDebt, strategy: PayoffStrategy, todayDay: number) {
   if (item.dueDay === todayDay) {
     return "Bugün kritik, gecikme riski var.";
@@ -210,6 +242,7 @@ export function buildPayoffScenario({
 
   let remainingAllocation = usableExtraBudget;
   const recommendations: PayoffPlannerItem[] = rankedDebts.slice(0, 3).map((item) => {
+    const drivers = buildDrivers(item, strategy, todayDay);
     const suggestedExtraPayment = roundCurrency(
       Math.min(item.remainingDebt, Math.max(remainingAllocation, 0)),
     );
@@ -225,6 +258,7 @@ export function buildPayoffScenario({
       dueDay: item.dueDay,
       suggestedExtraPayment,
       reason: buildReason(item, strategy, todayDay),
+      drivers,
     };
   });
 

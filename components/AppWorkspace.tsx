@@ -6,6 +6,8 @@ import type { Session } from "@supabase/supabase-js";
 import AuthGate from "@/components/AuthGate";
 import BackupPanel from "@/components/BackupPanel";
 import CashForm from "@/components/CashForm";
+import OnboardingEmptyState from "@/components/OnboardingEmptyState";
+import PayoffPlanner from "@/components/PayoffPlanner";
 import RecentActivity from "@/components/RecentActivity";
 import RiskOverview from "@/components/RiskOverview";
 import SettingsPanel from "@/components/SettingsPanel";
@@ -40,6 +42,7 @@ import { exportCsv } from "@/lib/exportCsv";
 import { getDebtLifecycleStatus } from "@/lib/debtLifecycle";
 import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
 import { formatCurrency, formatDateTime } from "@/lib/formatCurrency";
+import { buildPayoffScenario, parsePayoffExtraBudget } from "@/lib/payoffPlanner";
 import { addCashItem } from "@/lib/cashService";
 import { addDebtItem } from "@/lib/debtService";
 import { createPaymentItem } from "@/lib/paymentService";
@@ -56,6 +59,7 @@ import type {
   CurrencyCode,
   FlashMessage,
   FlashMessageType,
+  PayoffStrategy,
   RecentActivityItem,
   SummaryCard,
 } from "@/types/finance";
@@ -97,6 +101,50 @@ type AppWorkspaceProps = {
   section: AppSection;
 };
 
+function SkeletonLine({ className }: { className: string }) {
+  return <div className={`animate-pulse rounded-xl bg-gray-200 ${className}`} />;
+}
+
+function SectionLoadingState({
+  title,
+  description,
+}: {
+  title: string;
+  description: string;
+}) {
+  return (
+    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+      <div className="mb-4">
+        <p className="text-sm font-medium text-gray-900">{title}</p>
+        <p className="text-sm text-gray-500">{description}</p>
+      </div>
+      <div className="space-y-3">
+        <SkeletonLine className="h-16 w-full" />
+        <SkeletonLine className="h-16 w-full" />
+        <SkeletonLine className="h-16 w-full" />
+      </div>
+    </div>
+  );
+}
+
+function DashboardLoadingSkeleton() {
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <SkeletonLine className="h-32 w-full" />
+        <SkeletonLine className="h-32 w-full" />
+        <SkeletonLine className="h-32 w-full" />
+        <SkeletonLine className="h-32 w-full" />
+      </div>
+      <SkeletonLine className="h-36 w-full" />
+      <div className="grid gap-6 xl:grid-cols-2">
+        <SkeletonLine className="h-72 w-full" />
+        <SkeletonLine className="h-72 w-full" />
+      </div>
+    </div>
+  );
+}
+
 export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const [message, setMessage] = useState<FlashMessage | null>(null);
   const [session, setSession] = useState<Session | null>(null);
@@ -114,6 +162,9 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const [backupPreview, setBackupPreview] = useState<BackupPreview | null>(null);
   const [pendingBackup, setPendingBackup] = useState<AppBackup | null>(null);
   const [isImportingBackup, setIsImportingBackup] = useState<boolean>(false);
+  const [selectedPayoffStrategy, setSelectedPayoffStrategy] =
+    useState<PayoffStrategy>("highest_interest");
+  const [plannerExtraBudget, setPlannerExtraBudget] = useState<string>("");
   const messageTimeoutRef = useRef<number | null>(null);
   const authContext = useMemo(
     () => buildAuthContext(session?.user.id ?? null),
@@ -289,7 +340,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
         console.error("Auth oturumu alınamadı:", error);
         if (isMounted) {
           setAuthLoading(false);
-          showAuthMessage("Oturum kontrolü yapılamadı.", "error");
+          showAuthMessage(
+            "Oturum kontrolü tamamlanamadı. Sayfayı yenileyip tekrar deneyin.",
+            "error",
+          );
         }
       });
 
@@ -402,11 +456,31 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       }),
     [debts, last30DaysPaymentAmount, thisMonthPaymentAmount],
   );
-  const minimumPaymentTotal = monthlyPerformance.totalMinimumPaymentLoad;
-  const safeSpendableBalance = useMemo(
-    () => roundCurrency(currentCash - minimumPaymentTotal),
-    [currentCash, minimumPaymentTotal],
+  const parsedPlannerBudget = useMemo(
+    () => parsePayoffExtraBudget(plannerExtraBudget),
+    [plannerExtraBudget],
   );
+  const payoffScenario = useMemo(
+    () =>
+      buildPayoffScenario({
+        debts,
+        currentCash,
+        strategy: selectedPayoffStrategy,
+        extraBudget: parsedPlannerBudget.value,
+      }),
+    [currentCash, debts, parsedPlannerBudget.value, selectedPayoffStrategy],
+  );
+  const minimumPaymentTotal = monthlyPerformance.totalMinimumPaymentLoad;
+  const safeSpendableBalance = cashRiskSummary.safeSpendableBalance;
+  const isDashboardLoading =
+    (loadingCash || loadingDebts || loadingPayments) &&
+    cashList.length === 0 &&
+    debts.length === 0 &&
+    payments.length === 0;
+  const isDebtPageLoading = loadingDebts && debts.length === 0;
+  const isCashPageLoading = loadingCash && cashList.length === 0;
+  const isPlannerLoading =
+    (loadingCash || loadingDebts) && debts.length === 0 && cashList.length === 0;
   const summaryCards: SummaryCard[] = useMemo(
     () => [
       {
@@ -514,6 +588,14 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       )
       .slice(0, 12);
   }, [derivedActivities, runtimeActivities]);
+
+  const isOnboardingEmpty =
+    !loadingCash &&
+    !loadingDebts &&
+    !loadingPayments &&
+    cashList.length === 0 &&
+    debts.length === 0 &&
+    payments.length === 0;
 
   const handleExportCash = () => {
     try {
@@ -645,7 +727,9 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       setBackupPreview(null);
       console.error("Backup okuma hatası:", error);
       showMessage(
-        error instanceof Error ? error.message : "Yedek dosyası okunamadı.",
+        error instanceof Error
+          ? error.message
+          : "Yedek dosyası okunamadı. Dosyayı kontrol edip tekrar deneyin.",
         "error",
       );
     }
@@ -740,7 +824,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       handleClearBackupPreview();
     } catch (error) {
       console.error("Backup içe aktarma hatası:", error);
-      showMessage("JSON içe aktarma başarısız oldu.", "error");
+      showMessage(
+        "JSON içe aktarma başarısız oldu. Önizlemeyi kontrol edip tekrar deneyin.",
+        "error",
+      );
     } finally {
       setIsImportingBackup(false);
     }
@@ -770,7 +857,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       );
     } catch (error) {
       console.error("Auth giriş hatası:", error);
-      showAuthMessage("Giriş bağlantısı gönderilemedi.", "error");
+      showAuthMessage(
+        "Giriş bağlantısı gönderilemedi. Kısa süre sonra tekrar deneyin.",
+        "error",
+      );
     } finally {
       setAuthSubmitting(false);
     }
@@ -792,8 +882,16 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   if (authLoading) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-        <div className="rounded-2xl bg-white px-6 py-5 text-sm text-gray-600 shadow-sm ring-1 ring-gray-200">
-          Oturum kontrol ediliyor...
+        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
+          <p className="text-sm font-medium text-gray-900">Oturum hazırlanıyor</p>
+          <p className="mt-1 text-sm text-gray-500">
+            Hesap durumu kontrol ediliyor. Bu adım genelde birkaç saniye sürer.
+          </p>
+          <div className="mt-5 space-y-3">
+            <SkeletonLine className="h-12 w-full" />
+            <SkeletonLine className="h-12 w-full" />
+            <SkeletonLine className="h-12 w-2/3" />
+          </div>
         </div>
       </main>
     );
@@ -827,14 +925,17 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       )}
 
       <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-gray-200 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-gray-900">
               {session.user.email || "E-posta bilgisi olmayan hesap"}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="mt-1 text-xs text-gray-500">
               {getAuthModeLabel(authContext)} • Para birimi: {settings.currencyCode} •
               Veriler bu hesaba özeldir
+            </p>
+            <p className="mt-2 text-xs text-gray-400">
+              Verileriniz oturum bazında ayrılır ve yalnızca bu hesap kapsamında gösterilir.
             </p>
           </div>
 
@@ -845,7 +946,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
             <button
               type="button"
               onClick={handleSignOut}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+              className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 active:scale-[0.99]"
             >
               Çıkış Yap
             </button>
@@ -856,57 +957,68 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
 
         {section === "dashboard" && (
           <>
-            <SummaryCards cards={summaryCards} />
+            {isDashboardLoading ? (
+              <DashboardLoadingSkeleton />
+            ) : isOnboardingEmpty ? (
+              <OnboardingEmptyState email={session.user.email || null} />
+            ) : (
+              <>
+                <SummaryCards cards={summaryCards} />
 
-            <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-gray-900">
-                  Hızlı Aksiyonlar
-                </h3>
-                <p className="text-sm text-gray-500">
-                  Yönetim işlemlerine ilgili sayfalardan doğrudan geçin.
-                </p>
-              </div>
+                <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+                  <div className="mb-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                      Hızlı Geçiş
+                    </p>
+                    <h3 className="mt-2 text-xl font-semibold text-gray-900">
+                      Hızlı Aksiyonlar
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-gray-500">
+                      Yönetim işlemlerine ilgili sayfalardan doğrudan geçin.
+                    </p>
+                  </div>
 
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/debts"
-                  className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
-                >
-                  Borç Ekle
-                </Link>
-                <Link
-                  href="/payments"
-                  className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
-                >
-                  Ödeme Yap
-                </Link>
-                <Link
-                  href="/cash"
-                  className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
-                >
-                  Kasa Ekle
-                </Link>
-              </div>
-            </section>
+                  <div className="flex flex-wrap gap-3">
+                    <Link
+                      href="/debts"
+                      className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 active:scale-[0.99]"
+                    >
+                      Borç Ekle
+                    </Link>
+                    <Link
+                      href="/payments"
+                      className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-[0.99]"
+                    >
+                      Ödeme Yap
+                    </Link>
+                    <Link
+                      href="/cash"
+                      className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 active:scale-[0.99]"
+                    >
+                      Kasa Ekle
+                    </Link>
+                  </div>
+                </section>
 
-            <RiskOverview
-              priorities={debtPriorities}
-              cashRisk={cashRiskSummary}
-              performance={monthlyPerformance}
-              currencyCode={settings.currencyCode}
-            />
+                <RiskOverview
+                  priorities={debtPriorities}
+                  cashRisk={cashRiskSummary}
+                  performance={monthlyPerformance}
+                  currencyCode={settings.currencyCode}
+                />
 
-            <UpcomingPayments
-              items={upcomingPaymentItems.slice(0, 5)}
-              summary={upcomingPaymentSummary}
-              currencyCode={settings.currencyCode}
-            />
+                <UpcomingPayments
+                  items={upcomingPaymentItems.slice(0, 5)}
+                  summary={upcomingPaymentSummary}
+                  currencyCode={settings.currencyCode}
+                />
 
-            <RecentActivity
-              activities={recentActivities.slice(0, 5)}
-              currencyCode={settings.currencyCode}
-            />
+                <RecentActivity
+                  activities={recentActivities.slice(0, 5)}
+                  currencyCode={settings.currencyCode}
+                />
+              </>
+            )}
           </>
         )}
 
@@ -934,31 +1046,51 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
               onCancel={handleCancelDebtEdit}
             />
 
-            {loadingDebts && (
-              <div className="rounded-2xl bg-white p-4 text-sm text-gray-500 shadow-sm ring-1 ring-gray-200">
-                Borç verisi yükleniyor...
-              </div>
+            {isPlannerLoading ? (
+              <SectionLoadingState
+                title="Borç kapatma stratejisi hazırlanıyor"
+                description="Nakit ve borç verileri eşleştiriliyor. Öncelik önerileri kısa süre içinde görünecek."
+              />
+            ) : (
+              <PayoffPlanner
+                strategy={selectedPayoffStrategy}
+                extraBudget={plannerExtraBudget}
+                onStrategyChange={setSelectedPayoffStrategy}
+                onExtraBudgetChange={setPlannerExtraBudget}
+                scenario={payoffScenario}
+                validationError={parsedPlannerBudget.error}
+                currencyCode={settings.currencyCode}
+              />
             )}
 
-            <div className="space-y-4">
-              <Tabs selectedTab={selectedTab} onChangeTab={setSelectedTab} />
-
-              <DebtTable
-                debts={displayDebtTableData}
-                debtSearch={debtSearch}
-                onDebtSearchChange={setDebtSearch}
-                onExportDebts={handleExportDebts}
-                onEdit={handleEditDebt}
-                onDelete={handleDeleteDebt}
+            {isDebtPageLoading && (
+              <SectionLoadingState
+                title="Borç kayıtları yükleniyor"
+                description="Aktif ve kapanan borçlar hazırlanıyor. Liste birkaç saniye içinde görüntülenecek."
               />
+            )}
 
-              <ClosedDebts
-                debts={closedDebtItems}
-                currencyCode={settings.currencyCode}
-                onEditDebt={handleEditClosedDebt}
-                onDeleteDebt={handleDeleteDebt}
-              />
-            </div>
+            {!isDebtPageLoading && (
+              <div className="space-y-4">
+                <Tabs selectedTab={selectedTab} onChangeTab={setSelectedTab} />
+
+                <DebtTable
+                  debts={displayDebtTableData}
+                  debtSearch={debtSearch}
+                  onDebtSearchChange={setDebtSearch}
+                  onExportDebts={handleExportDebts}
+                  onEdit={handleEditDebt}
+                  onDelete={handleDeleteDebt}
+                />
+
+                <ClosedDebts
+                  debts={closedDebtItems}
+                  currencyCode={settings.currencyCode}
+                  onEditDebt={handleEditClosedDebt}
+                  onDeleteDebt={handleDeleteDebt}
+                />
+              </div>
+            )}
           </>
         )}
 
@@ -977,21 +1109,24 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
               onCancel={handleCancelCashEdit}
             />
 
-            {loadingCash && (
-              <div className="rounded-2xl bg-white p-4 text-sm text-gray-500 shadow-sm ring-1 ring-gray-200">
-                Kasa verisi yükleniyor...
-              </div>
+            {isCashPageLoading && (
+              <SectionLoadingState
+                title="Kasa kayıtları yükleniyor"
+                description="Bakiyeler ve son durum hazırlanıyor. Liste kısa süre içinde görüntülenecek."
+              />
             )}
 
-            <CashPanel
-              currentCash={currentCash}
-              cashList={filteredCashList}
-              currencyCode={settings.currencyCode}
-              cashSearch={cashSearch}
-              onCashSearchChange={setCashSearch}
-              onExportCash={handleExportCash}
-              onEditCash={handleEditCash}
-            />
+            {!isCashPageLoading && (
+              <CashPanel
+                currentCash={currentCash}
+                cashList={filteredCashList}
+                currencyCode={settings.currencyCode}
+                cashSearch={cashSearch}
+                onCashSearchChange={setCashSearch}
+                onExportCash={handleExportCash}
+                onEditCash={handleEditCash}
+              />
+            )}
           </>
         )}
 
