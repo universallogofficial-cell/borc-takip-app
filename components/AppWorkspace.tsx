@@ -898,7 +898,12 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
             note: cash.note,
           },
           { userId: authContext.userId },
+          true,
         );
+
+        if (!createdCash) {
+          throw new Error("İçe aktarılan kasa kaydı için yeni kimlik alınamadı.");
+        }
 
         cashIdMap.set(cash.id, createdCash.id);
       }

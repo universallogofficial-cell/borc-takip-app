@@ -26,57 +26,33 @@ export async function fetchCashItems(
 export async function addCashItem(
   payload: CashMutationInput,
   options: ServiceScopeOptions = {},
+  returnInsertedCash = false,
 ) {
   const insertPayload = options.userId
     ? [{ ...payload, user_id: options.userId }]
     : [payload];
-  console.info("cashService.addCashItem insert payload", {
-    insertPayload,
-    userId: options.userId ?? null,
-  });
-  const { error } = await supabase.from("cash").insert(insertPayload);
+
+  if (!returnInsertedCash) {
+    const { error } = await supabase.from("cash").insert(insertPayload);
+
+    if (error) {
+      throw error;
+    }
+
+    return null;
+  }
+
+  const { data, error } = await supabase
+    .from("cash")
+    .insert(insertPayload)
+    .select("*")
+    .single();
 
   if (error) {
-    console.error("cashService.addCashItem insert error", {
-      message: error.message,
-      details: error.details,
-      hint: error.hint,
-      code: error.code,
-    });
     throw error;
   }
 
-  let query = supabase
-    .from("cash")
-    .select("*")
-    .order("id", { ascending: false })
-    .limit(1);
-
-  if (options.userId) {
-    query = query.eq("user_id", options.userId);
-  } else {
-    query = query.eq("name", payload.name);
-  }
-
-  const { data: insertedCash, error: fetchError } = await query.maybeSingle();
-
-  if (fetchError) {
-    console.error("cashService.addCashItem fetch error", {
-      message: fetchError.message,
-      details: fetchError.details,
-      hint: fetchError.hint,
-      code: fetchError.code,
-    });
-    throw new Error(
-      `Kasa kaydı eklendi ancak yeni kayıt okunamadı: ${fetchError.message}`,
-    );
-  }
-
-  if (!insertedCash) {
-    throw new Error("Kasa kaydı eklendi ancak yeni kayıt doğrulanamadı.");
-  }
-
-  return insertedCash as CashItem;
+  return data as CashItem;
 }
 
 export async function updateCashItem(

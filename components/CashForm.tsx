@@ -35,13 +35,7 @@ export default function CashForm({
         {isEditingCash ? "Kasa Düzenle" : "Yeni Kasa Ekle"}
       </h2>
 
-      <form
-        onSubmit={(e) => {
-          console.info("CashForm submit tetiklendi");
-          onSubmit(e);
-        }}
-        className="grid gap-4 md:grid-cols-2"
-      >
+      <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
         <div>
           <label className="mb-1 block text-sm text-gray-600">Kasa Adı</label>
           <input

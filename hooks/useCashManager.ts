@@ -111,11 +111,6 @@ export function useCashManager({
 
   const handleAddCash = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.info("useCashManager.handleAddCash başladı", {
-      userId,
-      isEditingCash,
-      editingCashId,
-    });
 
     if (addingCash) {
       return;
@@ -139,10 +134,6 @@ export function useCashManager({
       balance: roundCurrency(balanceValue),
       note: cashNote.trim() || null,
     };
-    console.info("useCashManager.handleAddCash payload", {
-      cashPayload,
-      scopeOptions,
-    });
 
     try {
       if (isEditingCash && editingCashId !== null) {
@@ -163,26 +154,22 @@ export function useCashManager({
         return;
       }
 
-      const createdCash = await addCashItem(cashPayload, scopeOptions);
+      await addCashItem(cashPayload, scopeOptions);
 
       resetCashForm();
       await fetchCash();
       onActivity?.({
         entityType: "cash",
-        entityId: createdCash.id,
+        entityId: Date.now(),
         action: "created",
         actionLabel: "Kasa eklendi",
-        title: createdCash.name,
+        title: cashPayload.name,
         description: "Nakit planına yeni kasa kaydı eklendi.",
         amount: cashPayload.balance,
-        createdAt: createdCash.created_at,
+        createdAt: new Date().toISOString(),
       });
       onMessage("Kasa eklendi.", "success");
     } catch (error) {
-      console.error("useCashManager.handleAddCash catch", {
-        message: error instanceof Error ? error.message : String(error),
-        error,
-      });
       if (isEditingCash && editingCashId !== null) {
         console.error("Cash guncelleme hatasi:", error);
         onMessage(
