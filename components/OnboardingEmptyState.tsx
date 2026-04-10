@@ -149,9 +149,9 @@ export default function OnboardingEmptyState({
   const currentStepIndex = steps.findIndex((step) => step.title === currentStep.title);
 
   return (
-    <section className="rounded-[32px] bg-white px-5 py-8 shadow-sm ring-1 ring-gray-200 md:px-8 md:py-10">
+    <section className="finance-panel px-5 py-8 md:px-8 md:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
-        <div className="rounded-[28px] border border-gray-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] px-5 py-8 text-center md:px-8">
+        <div className="finance-surface-strong rounded-[28px] px-5 py-8 text-center md:px-8">
           <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-800">
             Yeni Kullanıcı Kurulumu
           </span>
@@ -164,7 +164,7 @@ export default function OnboardingEmptyState({
             gösterecek.
           </p>
           <div className="mx-auto mt-6 grid max-w-3xl gap-3 text-left sm:grid-cols-3">
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="finance-stat-card">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 İlerleme
               </p>
@@ -173,7 +173,7 @@ export default function OnboardingEmptyState({
               </p>
               <p className="mt-1 text-sm text-gray-500">adım tamamlandı</p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="finance-stat-card">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Şu An
               </p>
@@ -184,7 +184,7 @@ export default function OnboardingEmptyState({
                 Adım {currentStepIndex + 1} aktif
               </p>
             </div>
-            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+            <div className="finance-stat-card">
               <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                 Hesap
               </p>
@@ -208,7 +208,7 @@ export default function OnboardingEmptyState({
         </div>
 
         {!hasProfile ? (
-          <div className="mx-auto max-w-3xl rounded-[28px] border border-gray-200 bg-gray-50 p-5 shadow-sm md:p-6">
+          <div className="finance-surface-muted mx-auto max-w-3xl rounded-[28px] p-5 shadow-sm md:p-6">
             <div className="text-center">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
                 Adım 1
@@ -228,7 +228,7 @@ export default function OnboardingEmptyState({
                   type="text"
                   value={firstName}
                   onChange={(e) => onFirstNameChange(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
+                  className="finance-field"
                   placeholder="Örn: Emre"
                 />
               </div>
@@ -238,14 +238,14 @@ export default function OnboardingEmptyState({
                   type="text"
                   value={lastName}
                   onChange={(e) => onLastNameChange(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
+                  className="finance-field"
                   placeholder="Örn: Yılmaz"
                 />
               </div>
               <div className="sm:col-span-2 flex justify-center">
                 <button
                   type="submit"
-                  className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
+                  className="finance-button-primary w-full sm:w-auto"
                 >
                   Profili Kaydet ve Devam Et
                 </button>
@@ -268,7 +268,7 @@ export default function OnboardingEmptyState({
             {currentStep.href && !currentStep.done ? (
               <Link
                 href={currentStep.href}
-                className="mt-5 inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                className="finance-button-primary mt-5"
               >
                 {currentStep.cta}
               </Link>

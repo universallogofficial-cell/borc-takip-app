@@ -15,23 +15,24 @@ export default function ClosedDebts({
   onDeleteDebt,
 }: ClosedDebtsProps) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <section className="finance-panel p-5 md:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <p className="finance-kicker">Arşiv</p>
+          <h3 className="mt-2 text-lg font-semibold text-slate-950">
             Kapanan Borç Arşivi
           </h3>
-          <p className="text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             Kalan borcu kapanmış kayıtlar burada tutulur.
           </p>
         </div>
-        <div className="rounded-xl bg-gray-50 px-3 py-2 text-sm text-gray-600">
+        <div className="finance-badge finance-badge-neutral">
           {debts.length} kayıt
         </div>
       </div>
 
       {debts.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+        <div className="finance-empty p-4 text-sm text-slate-500">
           Kapanan borç arşivinde kayıt yok.
         </div>
       ) : (
@@ -39,7 +40,7 @@ export default function ClosedDebts({
           {debts.map((item) => (
             <div
               key={item.id}
-              className="rounded-xl border border-gray-200 p-4"
+              className="rounded-[24px] border border-slate-200/80 bg-white/90 p-4 shadow-sm"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
@@ -52,7 +53,7 @@ export default function ClosedDebts({
                   <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
                     <span>Ürün tipi: {item.productType}</span>
                     <span>Kalan borç: {formatCurrency(item.remainingDebt, currencyCode)}</span>
-                    <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                    <span className="finance-badge finance-badge-good">
                       Kapanmış
                     </span>
                   </div>
@@ -62,14 +63,14 @@ export default function ClosedDebts({
                   <button
                     type="button"
                     onClick={() => onEditDebt(item.id)}
-                    className="rounded-lg bg-blue-500 px-3 py-2 text-sm font-medium text-white hover:bg-blue-600"
+                    className="finance-button-ghost rounded-xl px-3 py-2"
                   >
                     Düzenle
                   </button>
                   <button
                     type="button"
                     onClick={() => onDeleteDebt(item.id)}
-                    className="rounded-lg bg-red-500 px-3 py-2 text-sm font-medium text-white hover:bg-red-600"
+                    className="finance-button-danger rounded-xl px-3 py-2"
                   >
                     Sil
                   </button>

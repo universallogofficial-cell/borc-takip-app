@@ -63,12 +63,13 @@ export default function PaymentList({
   onLoadMore,
 }: PaymentListProps) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <div className="finance-panel p-5 md:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Ödeme Geçmişi</h3>
-          <p className="text-sm text-gray-500">
-            Filtre, arama ve dışa aktarma ile ödeme kayıtlarını izleyin.
+          <p className="finance-kicker">Ödeme Geçmişi</p>
+          <h3 className="mt-2 text-xl font-semibold text-slate-950">Finansal hareketler</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Filtre, arama ve tutar görünümü ile ödeme akışını okunur biçimde izle.
           </p>
         </div>
 
@@ -77,7 +78,7 @@ export default function PaymentList({
             type="button"
             onClick={onExportPayments}
             disabled={!hasAnyPayments}
-            className="rounded-lg border border-gray-300 px-3 py-1 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
+            className="finance-button-ghost rounded-xl px-3 py-2"
           >
             CSV Dışa Aktar
           </button>
@@ -88,8 +89,8 @@ export default function PaymentList({
               onClick={() => onChangeFilter(filter.value)}
               className={`rounded-lg px-3 py-1 text-sm transition ${
                 selectedFilter === filter.value
-                  ? "bg-gray-900 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-slate-950 text-white shadow-[0_14px_28px_rgba(15,23,42,0.14)]"
+                  : "bg-slate-100 text-slate-600 hover:bg-slate-200"
               }`}
             >
               {filter.label}
@@ -99,38 +100,38 @@ export default function PaymentList({
       </div>
 
       <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Toplam Ödeme</p>
-          <p className="font-semibold text-gray-900">{totalPaymentCount}</p>
+        <div className="finance-stat-card">
+          <p className="text-sm text-slate-500">Toplam Ödeme</p>
+          <p className="font-semibold text-slate-950">{totalPaymentCount}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Toplam Tutar</p>
-          <p className="font-semibold text-gray-900">
+        <div className="finance-stat-card">
+          <p className="text-sm text-slate-500">Toplam Tutar</p>
+          <p className="font-semibold text-slate-950">
             {formatCurrency(totalPaymentAmount, currencyCode)}
           </p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Filtrede Görünen</p>
-          <p className="font-semibold text-gray-900">{filteredPaymentCount}</p>
+        <div className="finance-stat-card">
+          <p className="text-sm text-slate-500">Filtrede Görünen</p>
+          <p className="font-semibold text-slate-950">{filteredPaymentCount}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Filtre Tutarı</p>
-          <p className="font-semibold text-gray-900">
+        <div className="finance-stat-card">
+          <p className="text-sm text-slate-500">Filtre Tutarı</p>
+          <p className="font-semibold text-slate-950">
             {formatCurrency(filteredPaymentAmount, currencyCode)}
           </p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Son 30 Gün</p>
-          <p className="font-semibold text-gray-900">
+        <div className="finance-stat-card">
+          <p className="text-sm text-slate-500">Son 30 Gün</p>
+          <p className="font-semibold text-slate-950">
             {formatCurrency(last30DaysPaymentAmount, currencyCode)}
           </p>
         </div>
       </div>
 
-      <div className="mb-4 rounded-2xl bg-gray-50 p-4">
+      <div className="finance-surface-muted mb-4 rounded-[24px] p-4">
         <div className="mb-3">
-          <p className="text-sm font-medium text-gray-900">Filtreler</p>
-          <p className="text-sm text-gray-500">
+          <p className="text-sm font-medium text-slate-900">Filtreler</p>
+          <p className="text-sm text-slate-500">
             Tarih, metin ve tutar aralığı ile ödeme listesini daraltın.
           </p>
         </div>
@@ -143,8 +144,8 @@ export default function PaymentList({
               onClick={() => onChangeFilter(filter.value)}
               className={`rounded-lg px-3 py-1.5 text-sm transition ${
                 selectedFilter === filter.value
-                  ? "bg-gray-900 text-white"
-                  : "bg-white text-gray-700 ring-1 ring-gray-200 hover:bg-gray-100"
+                  ? "bg-slate-950 text-white"
+                  : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-50"
               }`}
             >
               {filter.label}
@@ -154,7 +155,7 @@ export default function PaymentList({
 
         <div className="grid gap-3 md:grid-cols-3">
           <div>
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Arama
             </label>
             <input
@@ -162,11 +163,11 @@ export default function PaymentList({
               value={paymentSearch}
               onChange={(e) => onChangePaymentSearch(e.target.value)}
               placeholder="Borç, kasa veya not ara"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="finance-field py-2"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Minimum tutar
             </label>
             <input
@@ -175,11 +176,11 @@ export default function PaymentList({
               value={paymentMinAmount}
               onChange={(e) => onChangePaymentMinAmount(e.target.value)}
               placeholder="Örn: 500"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="finance-field py-2"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Maksimum tutar
             </label>
             <input
@@ -188,19 +189,19 @@ export default function PaymentList({
               value={paymentMaxAmount}
               onChange={(e) => onChangePaymentMaxAmount(e.target.value)}
               placeholder="Örn: 5000"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="finance-field py-2"
             />
           </div>
         </div>
       </div>
 
       {loadingPayments ? (
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="finance-surface-muted rounded-[24px] p-4">
           <div className="mb-4">
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-slate-900">
               Ödeme kayıtları hazırlanıyor
             </p>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-500">
               Filtreler ve son hareketler yükleniyor. Liste kısa süre içinde görünecek.
             </p>
           </div>
@@ -211,13 +212,13 @@ export default function PaymentList({
           </div>
         </div>
       ) : payments.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 p-6 text-center">
-          <p className="text-sm font-medium text-gray-900">
+        <div className="finance-empty p-6 text-center">
+          <p className="text-sm font-medium text-slate-900">
             {hasAnyPayments
               ? "Seçili filtreler için ödeme kaydı yok."
               : "Henüz ödeme kaydı bulunmuyor."}
           </p>
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-slate-500">
             {hasAnyPayments
               ? "Filtreleri sadeleştirin veya yeni ödeme kaydı oluşturun."
               : "İlk ödeme kaydını ekleyerek hareket geçmişini oluşturmaya başlayın."}
@@ -232,7 +233,7 @@ export default function PaymentList({
                   onChangePaymentMinAmount("");
                   onChangePaymentMaxAmount("");
                 }}
-                className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+                className="finance-button-ghost"
               >
                 Filtreleri Temizle
               </button>
@@ -240,7 +241,7 @@ export default function PaymentList({
             <Link
               href="/app/payments"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-              className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
+              className="finance-button-secondary"
             >
               Yeni Ödeme Yap
             </Link>
@@ -251,34 +252,34 @@ export default function PaymentList({
           {payments.map((payment) => (
             <div
               key={payment.id}
-              className="rounded-xl border border-gray-200 p-4"
+              className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="break-words font-medium text-gray-900">{payment.debtName}</p>
-                  <p className="break-words text-sm text-gray-500">
+                  <p className="break-words font-medium text-slate-950">{payment.debtName}</p>
+                  <p className="break-words text-sm text-slate-500">
                     Kasa: {payment.cashName}
                   </p>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-slate-500">
                     Tarih: {formatDateTime(payment.createdAt)}
                   </p>
-                  <p className="mt-1 break-words text-sm text-gray-500">
+                  <p className="mt-1 break-words text-sm text-slate-500">
                     {payment.note || "Not yok"}
                   </p>
                 </div>
 
                 <div className="shrink-0 text-left sm:text-right">
-                  <p className="font-semibold text-gray-900">
+                  <p className="font-semibold text-slate-950">
                     {formatCurrency(payment.amount, currencyCode)}
                   </p>
                   <div className="mt-2 flex flex-wrap gap-2 sm:justify-end">
                     <button
                       type="button"
                       onClick={() => onEditPayment(payment.id)}
-                      className={`rounded-lg px-3 py-1 text-sm text-white transition ${
+                      className={`rounded-xl px-3 py-2 text-sm text-white transition ${
                         editingPaymentId === payment.id
-                          ? "bg-sky-700"
-                          : "bg-sky-600 hover:bg-sky-700"
+                          ? "bg-slate-950"
+                          : "bg-slate-900 hover:bg-slate-800"
                       }`}
                     >
                       Düzenle
@@ -287,7 +288,7 @@ export default function PaymentList({
                       type="button"
                       onClick={() => onDeletePayment(payment.id)}
                       disabled={deletingPaymentId === payment.id}
-                      className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white transition hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="finance-button-danger rounded-xl px-3 py-2 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {deletingPaymentId === payment.id ? "Siliniyor..." : "Sil"}
                     </button>
@@ -304,7 +305,7 @@ export default function PaymentList({
           <button
             type="button"
             onClick={onLoadMore}
-            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+            className="finance-button-ghost"
           >
             Daha Fazla Göster
           </button>

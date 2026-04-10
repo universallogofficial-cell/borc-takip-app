@@ -4,71 +4,83 @@ const features = [
   {
     title: "Borç Takibi",
     description:
-      "Borçlarını tek ekranda izle, vadeleri takip et ve kapanan kayıtları arşivle.",
+      "Borçlarını tek ekranda gör, kalan tutarı izle ve vadelerini kaçırmadan yönet.",
   },
   {
     title: "Kasa Yönetimi",
     description:
-      "Kasalarını ayrı ayrı yönet, bakiyeni kontrol et ve ödemelerin etkisini gör.",
+      "Kasalarını ayrı ayrı takip et, bakiyeni net gör ve ödemelerin etkisini anında izle.",
   },
   {
-    title: "Akıllı Analiz",
+    title: "Ödeme Planı",
     description:
-      "Risk görünümü, yaklaşan ödemeler ve öncelik önerileriyle ne yapman gerektiğini anla.",
+      "Yaklaşan ödemeleri takip et, ödeme geçmişini kaydet ve planını daha kontrollü ilerlet.",
   },
 ];
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f8fafc_0%,#eef2f7_100%)] px-4 py-6 md:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl flex-col justify-center gap-8">
-        <section className="overflow-hidden rounded-[36px] border border-gray-200 bg-white shadow-[0_30px_80px_rgba(15,23,42,0.08)]">
-          <div className="grid gap-10 px-6 py-10 md:px-10 md:py-14 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:items-center">
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#eef6ff_0%,#f8fafc_38%,#edf2f7_100%)] px-4 py-5 md:px-6 md:py-6">
+      <div className="mx-auto flex min-h-[calc(100vh-2.5rem)] max-w-6xl flex-col justify-between gap-10">
+        <section className="overflow-hidden rounded-[36px] border border-slate-200/80 bg-white/95 shadow-[0_30px_80px_rgba(15,23,42,0.08)] backdrop-blur">
+          <div className="grid gap-10 px-6 py-8 md:px-10 md:py-12 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] xl:items-center">
             <div className="max-w-2xl">
               <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">
-                Kişisel Finans Kontrolü
+                Borç Takip
               </span>
-              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-gray-950 md:text-5xl">
+              <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950 md:text-5xl">
                 Borçlarını kontrol altına al
               </h1>
-              <p className="mt-5 text-base leading-7 text-gray-600 md:text-lg">
-                Borçlarını, nakit durumunu ve ödeme hareketlerini tek merkezden yönet.
-                Sade arayüz ve anlaşılır analizlerle ilk günden ne durumda olduğunu gör.
+              <p className="mt-5 max-w-xl text-base leading-7 text-slate-600 md:text-lg">
+                Borçlarını, kasalarını ve ödeme planını tek yerden yönet. İlk bakışta
+                nerede olduğunu anla, finansal düzenini daha sakin ve kontrollü kur.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
                   href="/app"
-                  className="inline-flex items-center justify-center rounded-xl bg-gray-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800"
+                  className="inline-flex items-center justify-center rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
                 >
-                  Hemen başla
+                  Ücretsiz başla
                 </Link>
+                <div className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+                  <span className="rounded-full bg-slate-100 px-3 py-1">
+                    Ücretsiz kullanım
+                  </span>
+                  <span className="rounded-full bg-slate-100 px-3 py-1">
+                    Verileriniz size özeldir
+                  </span>
+                </div>
               </div>
             </div>
 
             <div className="grid gap-4">
-              <div className="rounded-[28px] bg-gray-950 px-6 py-6 text-white shadow-lg">
+              <div className="rounded-[28px] bg-slate-950 px-6 py-6 text-white shadow-lg">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-                  Net Görünüm
+                  Güvenli Başlangıç
                 </p>
                 <p className="mt-3 text-2xl font-semibold">
-                  Borç, kasa ve ödeme akışın aynı çerçevede.
+                  Ne kadar borcun var, hangi kasada ne kaldı, hepsi net olsun.
                 </p>
                 <p className="mt-3 text-sm leading-6 text-white/75">
-                  İlk kayıttan sonra dashboard sana kalan yükü, ödeme ritmini ve güvenli
-                  nakit alanını birlikte gösterir.
+                  Sade arayüz, anlaşılır alanlar ve yönlendirilmiş akış sayesinde ilk
+                  günden itibaren sistemi kullanmaya başlayabilirsin.
                 </p>
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
-                <div className="rounded-[24px] border border-gray-200 bg-gray-50 p-5">
-                  <p className="text-sm font-semibold text-gray-900">Tek merkez</p>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    Dağınık notlar yerine düzenli finans kaydı.
+                <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
+                  <p className="text-sm font-semibold text-slate-900">
+                    Verileriniz size özeldir
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Kayıtlar hesap bazında tutulur ve yalnızca size ait görünür.
                   </p>
                 </div>
-                <div className="rounded-[24px] border border-gray-200 bg-gray-50 p-5">
-                  <p className="text-sm font-semibold text-gray-900">Hızlı başlangıç</p>
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    İlk kullanımda adım adım yönlendirme ile boş ekran yok.
+                <div className="rounded-[24px] border border-slate-200 bg-slate-50 p-5">
+                  <p className="text-sm font-semibold text-slate-900">
+                    Kullanımı ücretsiz
+                  </p>
+                  <p className="mt-2 text-sm leading-6 text-slate-600">
+                    Hemen başlayabilir, ilk borç ve kasa kayıtlarını ücretsiz oluşturabilirsin.
                   </p>
                 </div>
               </div>
@@ -80,15 +92,19 @@ export default function LandingPage() {
           {features.map((feature) => (
             <article
               key={feature.title}
-              className="rounded-[28px] border border-gray-200 bg-white p-6 shadow-sm"
+              className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-sm"
             >
-              <p className="text-sm font-semibold text-gray-900">{feature.title}</p>
-              <p className="mt-3 text-sm leading-6 text-gray-600">
+              <p className="text-sm font-semibold text-slate-900">{feature.title}</p>
+              <p className="mt-3 text-sm leading-6 text-slate-600">
                 {feature.description}
               </p>
             </article>
           ))}
         </section>
+
+        <footer className="pb-2 text-center text-sm text-slate-500">
+          © 2026 Borç Takip
+        </footer>
       </div>
     </main>
   );

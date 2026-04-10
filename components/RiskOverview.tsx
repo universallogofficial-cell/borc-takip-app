@@ -26,16 +26,16 @@ export default function RiskOverview({
       : "border-emerald-200 bg-emerald-50 text-emerald-800";
 
   return (
-    <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+    <section className="finance-panel p-5 md:p-6">
       <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+        <p className="finance-kicker">
           Risk Merkezi
         </p>
-        <h3 className="mt-2 text-xl font-semibold text-gray-900">
+        <h3 className="mt-2 text-xl font-semibold text-slate-950">
           Risk ve Öncelik
         </h3>
-        <p className="mt-2 text-sm leading-6 text-gray-500">
-          Nakit riski, ödeme önceliği ve aylık performans tek alanda izlenir.
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Nakit riski, öncelik sırası ve aylık baskı tek karar ekranında toplanır.
         </p>
       </div>
 
@@ -74,7 +74,7 @@ export default function RiskOverview({
       </div>
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="finance-stat-card">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             Yakın Dönem Yükümlülük
           </p>
@@ -89,7 +89,7 @@ export default function RiskOverview({
           </p>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="finance-stat-card">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             Minimum Ödeme ve Güvenli Alan
           </p>
@@ -124,7 +124,7 @@ export default function RiskOverview({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="finance-stat-card">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
             Aylık Performans
           </p>
@@ -150,7 +150,7 @@ export default function RiskOverview({
         </h4>
 
         {priorities.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+          <div className="finance-empty p-4 text-sm text-slate-500">
             Önceliklendirilecek aktif borç kaydı yok.
           </div>
         ) : (
@@ -158,12 +158,12 @@ export default function RiskOverview({
             {priorities.map((item, index) => (
               <div
                 key={item.id}
-                className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
+                className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
               >
                 <div className="flex flex-wrap items-start justify-between gap-4">
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-gray-900 px-2.5 py-1 text-xs font-semibold text-white">
+                      <span className="finance-badge bg-slate-950 text-white">
                         #{index + 1}
                       </span>
                       <p className="break-words font-semibold text-gray-900">
@@ -191,7 +191,7 @@ export default function RiskOverview({
                     {item.reasons.map((reason) => (
                       <span
                         key={reason}
-                        className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-800"
+                        className="finance-badge finance-badge-warn"
                       >
                         {reason}
                       </span>

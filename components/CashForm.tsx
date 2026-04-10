@@ -35,48 +35,52 @@ export default function CashForm({
 
   return (
     <div
-      className={`rounded-2xl p-5 shadow-sm ring-1 ${
-        isEditingCash
-          ? "bg-emerald-50 ring-emerald-300"
-          : "bg-white ring-gray-200"
+      className={`finance-panel p-5 md:p-6 ${
+        isEditingCash ? "border-emerald-200 bg-emerald-50/70" : ""
       }`}
     >
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">
-        {isEditingCash ? "Kasa Düzenle" : "Yeni Kasa Ekle"}
-      </h2>
+      <div className="mb-5">
+        <p className="finance-kicker">Nakit Yönetimi</p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-950">
+          {isEditingCash ? "Kasa kaydını güncelle" : "Yeni kasa oluştur"}
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Kasalarını ayrı ayrı izle, bakiyeyi güncel tut ve ödeme etkilerini daha net gör.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Kasa Adı</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Kasa Adı</label>
           <input
             type="text"
             value={cashName}
             onChange={(e) => setCashName(e.target.value)}
             disabled={addingCash}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: Ana Kasa"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Bakiye</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Bakiye</label>
           <input
             type="number"
             value={cashBalance}
             onChange={(e) => setCashBalance(e.target.value)}
             disabled={addingCash}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: 5000"
           />
         </div>
 
         <div className="md:col-span-2">
-          <label className="mb-1 block text-sm text-gray-600">Not</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Not</label>
           <textarea
             value={cashNote}
             onChange={(e) => setCashNote(e.target.value)}
             disabled={addingCash}
-            className="min-h-[80px] w-full rounded-xl border border-gray-300 px-3 py-2 outline-none focus:border-gray-500"
+            className="finance-field min-h-[110px]"
             placeholder="İsteğe bağlı not"
           />
         </div>
@@ -85,7 +89,7 @@ export default function CashForm({
           <button
             type="submit"
             disabled={addingCash}
-            className="rounded-xl bg-green-600 px-4 py-2 text-white transition hover:bg-green-700 disabled:opacity-50"
+            className="finance-button-secondary"
           >
             {addingCash
               ? isEditingCash
@@ -100,7 +104,7 @@ export default function CashForm({
               type="button"
               onClick={onCancel}
               disabled={addingCash}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-gray-700 transition hover:bg-gray-100 disabled:opacity-50"
+              className="finance-button-ghost"
             >
               İptal
             </button>

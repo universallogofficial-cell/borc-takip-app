@@ -242,150 +242,181 @@ export default function AuthGate({
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-      <section className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Borç Takip Sistemi</h1>
-          <p className="mt-2 text-sm text-gray-600">
-            Hesabınıza giriş yapın ve borç, kasa ve ödeme verilerinize güvenli
-            şekilde erişin.
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#eef6ff_0%,#f4f7fb_38%,#e9eef5_100%)] p-4 md:p-6">
+      <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(420px,0.96fr)] lg:items-center">
+        <section className="finance-surface-strong hidden rounded-[36px] px-8 py-10 lg:block">
+          <span className="finance-badge finance-badge-good">Premium finans deneyimi</span>
+          <h1 className="mt-6 max-w-xl text-5xl font-semibold tracking-tight text-slate-950">
+            Borç, nakit ve ödeme düzenini tek merkezde kur.
+          </h1>
+          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
+            Hesabına giriş yaptığında yönlendirilmiş onboarding, güvenli veri erişimi
+            ve karar destekli bir dashboard ile başlarsın. Ürün paneli değil, kişisel
+            finans çalışma alanı hissi verir.
           </p>
-        </div>
-
-        <div className="space-y-4">
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            disabled={isBusy}
-            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {localSubmitting ? "Yönlendiriliyor..." : "Google ile giriş"}
-          </button>
-
-          <div className="flex items-center gap-3">
-            <div className="h-px flex-1 bg-gray-200" />
-            <span className="text-xs font-medium uppercase tracking-wide text-gray-400">
-              veya e-posta ile devam et
-            </span>
-            <div className="h-px flex-1 bg-gray-200" />
-          </div>
-        </div>
-
-        <div className="mt-5 grid grid-cols-3 gap-2 rounded-xl bg-gray-100 p-1">
-          <button
-            type="button"
-            onClick={() => switchMode("sign_in")}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-              mode === "sign_in"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Giriş Yap
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("sign_up")}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-              mode === "sign_up"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Kayıt Ol
-          </button>
-          <button
-            type="button"
-            onClick={() => switchMode("forgot_password")}
-            className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-              mode === "forgot_password"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900"
-            }`}
-          >
-            Şifremi Unuttum
-          </button>
-        </div>
-
-        <div className="mt-5 mb-4">
-          <h2 className="text-lg font-semibold text-gray-900">
-            {currentCopy.title}
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">{currentCopy.description}</p>
-        </div>
-
-        <form onSubmit={handleEmailAuth} className="space-y-4">
-          <div>
-            <label className="mb-1 block text-sm text-gray-600">E-posta</label>
-            <input
-              type="email"
-              value={formEmail}
-              onChange={(e) => updateEmail(e.target.value)}
-              disabled={isBusy}
-              autoComplete="email"
-              placeholder="ornek@mail.com"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:opacity-50"
-            />
-          </div>
-
-          {mode !== "forgot_password" && (
-            <div>
-              <label className="mb-1 block text-sm text-gray-600">Şifre</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={isBusy}
-                autoComplete={mode === "sign_up" ? "new-password" : "current-password"}
-                placeholder="En az 6 karakter"
-                className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500 disabled:opacity-50"
-              />
+          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+            <div className="finance-stat-card">
+              <p className="text-sm font-semibold text-slate-900">Verileriniz size özeldir</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Hesap bazlı görünür, oturum dışında açılmaz.
+              </p>
             </div>
-          )}
+            <div className="finance-stat-card">
+              <p className="text-sm font-semibold text-slate-900">Sade ama güçlü</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                İhtiyacın olan veriler öne çıkar, gürültü geri çekilir.
+              </p>
+            </div>
+            <div className="finance-stat-card">
+              <p className="text-sm font-semibold text-slate-900">Hızlı başlangıç</p>
+              <p className="mt-2 text-sm leading-6 text-slate-600">
+                Google, e-posta veya giriş bağlantısı ile birkaç adımda hazır.
+              </p>
+            </div>
+          </div>
+        </section>
 
-          {visibleMessage && (
-            <div
-              className={`rounded-xl border p-3 text-sm ${
-                visibleMessage.type === "error"
-                  ? "border-red-200 bg-red-50 text-red-700"
-                  : "border-emerald-200 bg-emerald-50 text-emerald-700"
+        <section className="finance-surface-strong w-full rounded-[32px] p-6 md:p-8">
+          <div className="mb-6">
+            <p className="finance-kicker">Borç Takip</p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+              {currentCopy.title}
+            </h2>
+            <p className="mt-3 text-sm leading-6 text-slate-600">{currentCopy.description}</p>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="finance-badge finance-badge-neutral">Ücretsiz kullanım</span>
+              <span className="finance-badge finance-badge-neutral">Verileriniz size özeldir</span>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <button
+              type="button"
+              onClick={handleGoogleSignIn}
+              disabled={isBusy}
+              className="finance-button-ghost w-full"
+            >
+              {localSubmitting ? "Yönlendiriliyor..." : "Google ile giriş"}
+            </button>
+
+            <div className="flex items-center gap-3">
+              <div className="h-px flex-1 bg-slate-200" />
+              <span className="text-xs font-medium uppercase tracking-[0.16em] text-slate-400">
+                veya e-posta ile devam et
+              </span>
+              <div className="h-px flex-1 bg-slate-200" />
+            </div>
+          </div>
+
+          <div className="mt-5 grid grid-cols-3 gap-2 rounded-[20px] bg-slate-100/80 p-1.5">
+            <button
+              type="button"
+              onClick={() => switchMode("sign_in")}
+              className={`rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                mode === "sign_in"
+                  ? "bg-white text-slate-950 shadow-[0_12px_26px_rgba(15,23,42,0.08)]"
+                  : "text-slate-500 hover:text-slate-900"
               }`}
             >
-              {visibleMessage.text}
+              Giriş Yap
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("sign_up")}
+              className={`rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                mode === "sign_up"
+                  ? "bg-white text-slate-950 shadow-[0_12px_26px_rgba(15,23,42,0.08)]"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              Kayıt Ol
+            </button>
+            <button
+              type="button"
+              onClick={() => switchMode("forgot_password")}
+              className={`rounded-2xl px-3 py-2.5 text-sm font-medium transition ${
+                mode === "forgot_password"
+                  ? "bg-white text-slate-950 shadow-[0_12px_26px_rgba(15,23,42,0.08)]"
+                  : "text-slate-500 hover:text-slate-900"
+              }`}
+            >
+              Şifremi Unuttum
+            </button>
+          </div>
+
+          <form onSubmit={handleEmailAuth} className="mt-5 space-y-4">
+            <div>
+              <label className="mb-1.5 block text-sm font-medium text-slate-700">E-posta</label>
+              <input
+                type="email"
+                value={formEmail}
+                onChange={(e) => updateEmail(e.target.value)}
+                disabled={isBusy}
+                autoComplete="email"
+                placeholder="ornek@mail.com"
+                className="finance-field"
+              />
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={isBusy}
-            className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            {isBusy
-              ? mode === "forgot_password"
-                ? "Gönderiliyor..."
-                : mode === "sign_up"
-                  ? "Hesap oluşturuluyor..."
-                  : "Giriş yapılıyor..."
-              : currentCopy.submitLabel}
-          </button>
-        </form>
+            {mode !== "forgot_password" && (
+              <div>
+                <label className="mb-1.5 block text-sm font-medium text-slate-700">Şifre</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  disabled={isBusy}
+                  autoComplete={mode === "sign_up" ? "new-password" : "current-password"}
+                  placeholder="En az 6 karakter"
+                  className="finance-field"
+                />
+              </div>
+            )}
 
-        <div className="mt-4 text-center">
-          <button
-            type="button"
-            onClick={handleMagicLink}
-            disabled={isBusy}
-            className="text-sm font-medium text-gray-600 underline-offset-4 transition hover:text-gray-900 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            Bunun yerine giriş bağlantısı gönder
-          </button>
-        </div>
+            {visibleMessage && (
+              <div
+                className={`rounded-[20px] border p-3 text-sm ${
+                  visibleMessage.type === "error"
+                    ? "border-red-200 bg-red-50 text-red-700"
+                    : "border-emerald-200 bg-emerald-50 text-emerald-700"
+                }`}
+              >
+                {visibleMessage.text}
+              </div>
+            )}
 
-        <div className="mt-4 rounded-xl bg-gray-50 p-3 text-xs text-gray-500">
-          Veriler yalnızca oturum açılan hesap kapsamına göre gösterilir.
-          Giriş yapılmadan uygulama ekranları açılmaz.
-        </div>
-      </section>
+            <button
+              type="submit"
+              disabled={isBusy}
+              className="finance-button-primary w-full"
+            >
+              {isBusy
+                ? mode === "forgot_password"
+                  ? "Gönderiliyor..."
+                  : mode === "sign_up"
+                    ? "Hesap oluşturuluyor..."
+                    : "Giriş yapılıyor..."
+                : currentCopy.submitLabel}
+            </button>
+          </form>
+
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={handleMagicLink}
+              disabled={isBusy}
+              className="text-sm font-medium text-slate-600 underline-offset-4 transition hover:text-slate-900 hover:underline disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Bunun yerine giriş bağlantısı gönder
+            </button>
+          </div>
+
+          <div className="mt-5 rounded-[22px] bg-slate-50 px-4 py-4 text-xs leading-6 text-slate-500 ring-1 ring-slate-200/80">
+            Veriler yalnızca oturum açılan hesap kapsamında görüntülenir. Giriş yapılmadan
+            uygulama ekranları açılmaz ve tüm akış aynı güvenli tasarım diliyle ilerler.
+          </div>
+        </section>
+      </div>
     </main>
   );
 }

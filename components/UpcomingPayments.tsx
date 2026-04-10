@@ -36,43 +36,25 @@ const statusConfig: Record<
 
 export default function UpcomingPayments({
   items,
-  summary,
   currencyCode,
 }: UpcomingPaymentsProps) {
   return (
-    <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+    <section className="finance-panel p-5 md:p-6">
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">
+          <p className="finance-kicker">Takvim</p>
+          <h3 className="mt-2 text-lg font-semibold text-slate-950">
             Yaklaşan Ödemeler
           </h3>
-          <p className="text-sm text-gray-500">
-            Vadesi olan aktif borçları aylık görünümde izleyin.
+          <p className="mt-2 text-sm text-slate-500">
+            Önündeki ödemeleri sade bir liste görünümünde izle.
           </p>
         </div>
-      </div>
-
-      <div className="mb-4 grid gap-3 sm:grid-cols-3">
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Bu Ay Vadesi Olan</p>
-          <p className="font-semibold text-gray-900">
-            {summary.dueThisMonthCount}
-          </p>
-        </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Toplam Minimum Ödeme</p>
-          <p className="font-semibold text-gray-900">
-            {formatCurrency(summary.totalMinimumPayment, currencyCode)}
-          </p>
-        </div>
-        <div className="rounded-xl bg-gray-50 p-3">
-          <p className="text-sm text-gray-500">Bugün / Yakın Kayıt</p>
-          <p className="font-semibold text-gray-900">{summary.urgentCount}</p>
-        </div>
+        <span className="finance-badge finance-badge-neutral">{items.length} kayıt</span>
       </div>
 
       {items.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+        <div className="finance-empty p-4 text-sm text-slate-500">
           Henüz yaklaşan ödeme kaydı bulunmuyor.
         </div>
       ) : (
@@ -83,7 +65,7 @@ export default function UpcomingPayments({
             return (
               <div
                 key={item.id}
-                className="rounded-xl border border-gray-200 p-4"
+                className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
                   <div className="min-w-0 flex-1">
@@ -105,7 +87,7 @@ export default function UpcomingPayments({
                   </div>
 
                   <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${status.className}`}
+                    className={`finance-badge ${status.className}`}
                   >
                     {status.label}
                   </span>

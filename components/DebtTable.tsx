@@ -55,22 +55,22 @@ export default function DebtTable({
   }, [debts, sortOption]);
 
   return (
-    <div className="xl:col-span-2 rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+    <div className="finance-panel xl:col-span-2 p-5 md:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+          <p className="finance-kicker">
             Aktif Portföy
           </p>
-          <h3 className="mt-2 text-xl font-semibold text-gray-900">
+          <h3 className="mt-2 text-xl font-semibold text-slate-950">
             Aktif Borçlar
           </h3>
-          <p className="mt-2 text-sm leading-6 text-gray-500">
-            Açık borç kayıtlarını arayın, düzenleyin ve dışa aktarın.
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Açık borçları okunabilir bir portföy görünümünde izle.
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <div className="w-full sm:min-w-72">
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Arama
             </label>
             <input
@@ -78,17 +78,17 @@ export default function DebtTable({
               value={debtSearch}
               onChange={(e) => onDebtSearchChange(e.target.value)}
               placeholder="Borç adı veya kurum ara"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-gray-500"
+              className="finance-field py-2"
             />
           </div>
           <div className="w-full sm:min-w-48">
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Sıralama
             </label>
             <select
               value={sortOption}
               onChange={(e) => setSortOption(e.target.value as DebtSortOption)}
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none transition focus:border-gray-500"
+              className="finance-field py-2"
             >
               <option value="due_asc">Vade günü yakın</option>
               <option value="amount_desc">Tutar yüksekten düşüğe</option>
@@ -99,7 +99,7 @@ export default function DebtTable({
             type="button"
             onClick={onExportDebts}
             disabled={debts.length === 0}
-            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:self-end"
+            className="finance-button-ghost sm:self-end"
           >
             CSV Dışa Aktar
           </button>
@@ -109,7 +109,7 @@ export default function DebtTable({
       <div className="overflow-x-auto">
       <table className="min-w-[720px] border-separate border-spacing-y-3">
         <thead>
-          <tr className="text-left text-sm text-gray-500">
+          <tr className="text-left text-sm text-slate-500">
             <th className="pb-2">Kişi</th>
             <th className="pb-2">Tür</th>
             <th className="pb-2">Tutar</th>
@@ -122,13 +122,13 @@ export default function DebtTable({
           {sortedDebts.length === 0 ? (
             <tr>
               <td colSpan={6} className="py-4">
-                <div className="rounded-2xl border border-dashed border-gray-300 p-6 text-center">
-                  <p className="text-sm font-medium text-gray-900">
+                <div className="finance-empty p-6 text-center">
+                  <p className="text-sm font-medium text-slate-900">
                     {debtSearch.trim()
                       ? "Aramanıza uygun aktif borç kaydı yok."
                       : "Henüz aktif borç kaydı bulunmuyor."}
                   </p>
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm text-slate-500">
                     {debtSearch.trim()
                       ? "Arama ifadesini temizleyin veya yeni borç kaydı ekleyin."
                       : "İlk borç kaydını oluşturarak takip ekranını doldurun."}
@@ -138,7 +138,7 @@ export default function DebtTable({
                       <button
                         type="button"
                         onClick={() => onDebtSearchChange("")}
-                        className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+                        className="finance-button-ghost"
                       >
                         Aramayı Temizle
                       </button>
@@ -146,7 +146,7 @@ export default function DebtTable({
                     <Link
                       href="/app/debts"
                       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                      className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
+                      className="finance-button-primary"
                     >
                       Yeni Borç Ekle
                     </Link>
@@ -156,17 +156,17 @@ export default function DebtTable({
             </tr>
           ) : (
             sortedDebts.map((item) => (
-              <tr key={item.id} className="bg-gray-50 transition hover:bg-gray-100/70">
+              <tr key={item.id} className="bg-white/80 transition hover:bg-slate-50/90">
                 <td className="rounded-l-2xl px-4 py-4">
                   <div className="space-y-1">
-                    <p className="break-words font-semibold text-gray-900">{item.name}</p>
-                    <p className="text-xs uppercase tracking-wide text-gray-400">
+                    <p className="break-words font-semibold text-slate-950">{item.name}</p>
+                    <p className="text-xs uppercase tracking-wide text-slate-400">
                       Öncelik görünümü
                     </p>
                   </div>
                 </td>
                 <td className="px-4 py-4 break-words">{item.type}</td>
-                <td className="px-4 py-4 font-medium text-gray-900">{item.amount}</td>
+                <td className="px-4 py-4 font-medium text-slate-950">{item.amount}</td>
                 <td className="px-4 py-4">{item.dueDate}</td>
                 <td className="px-4 py-4 break-words">{item.status}</td>
                 <td className="rounded-r-2xl px-4 py-4">
@@ -174,14 +174,14 @@ export default function DebtTable({
                     <button
                       type="button"
                       onClick={() => onEdit(item)}
-                      className="rounded-xl bg-blue-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-[0.99]"
+                      className="finance-button-ghost rounded-xl px-3 py-2"
                     >
                       Düzenle
                     </button>
                     <button
                       type="button"
                       onClick={() => onDelete(item.id)}
-                      className="rounded-xl bg-red-500 px-3 py-2 text-sm font-medium text-white transition hover:bg-red-600 active:scale-[0.99]"
+                      className="finance-button-danger rounded-xl px-3 py-2"
                     >
                       Sil
                     </button>

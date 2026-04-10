@@ -11,19 +11,19 @@ export default function RecentActivity({
   currencyCode,
 }: RecentActivityProps) {
   return (
-    <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+    <section className="finance-panel p-5 md:p-6">
       <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+        <p className="finance-kicker">
           Son Hareketler
         </p>
-        <h3 className="mt-2 text-xl font-semibold text-gray-900">Aktivite Geçmişi</h3>
-        <p className="mt-2 text-sm leading-6 text-gray-500">
-          Son işlemleriniz burada anlamlı bir operasyon geçmişi olarak görünür.
+        <h3 className="mt-2 text-xl font-semibold text-slate-950">Aktivite akışı</h3>
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Son işlemler ürün diliyle özetlenmiş bir hareket akışı olarak görünür.
         </p>
       </div>
 
       {activities.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 p-4 text-sm text-gray-500">
+        <div className="finance-empty p-4 text-sm text-slate-500">
           İlk işlem yapıldığında hareket özeti burada görünür.
         </div>
       ) : (
@@ -31,7 +31,7 @@ export default function RecentActivity({
           {activities.map((activity) => (
             <div
               key={activity.id}
-              className="rounded-2xl border border-gray-200 p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
+              className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
@@ -45,7 +45,7 @@ export default function RecentActivity({
                     {activity.description}
                   </p>
                 </div>
-                <div className="shrink-0 rounded-2xl bg-gray-50 p-3 text-left sm:text-right">
+                <div className="shrink-0 rounded-[20px] bg-slate-50 p-3 text-left sm:text-right">
                   {activity.amount !== null && (
                     <p className="font-semibold text-gray-900">
                       {formatCurrency(activity.amount, currencyCode)}

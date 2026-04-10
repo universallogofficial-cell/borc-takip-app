@@ -95,44 +95,41 @@ export default function DebtForm({
 
   return (
     <div
-      className={`rounded-[28px] p-5 shadow-sm ring-1 md:p-6 ${
-        isEditingDebt ? "bg-amber-50 ring-amber-300" : "bg-white ring-gray-200"
+      className={`finance-panel p-5 md:p-6 ${
+        isEditingDebt ? "border-amber-200 bg-amber-50/70" : ""
       }`}
     >
       <div className="mb-5">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
-          Borç Kaydı
-        </p>
-        <h2 className="mt-2 text-xl font-semibold text-gray-900">
-          {isEditingDebt ? "Borç Kaydını Düzenle" : "Yeni Borç Ekle"}
+        <p className="finance-kicker">Borç Portföyü</p>
+        <h2 className="mt-2 text-xl font-semibold text-slate-950">
+          {isEditingDebt ? "Borç kaydını güncelle" : "Yeni borç oluştur"}
         </h2>
-        <p className="mt-2 text-sm leading-6 text-gray-500">
-          Hazır kurum ve ürün seçenekleri ile daha hızlı giriş yapın. Gerekirse
-          özel kurum veya ürün adı ekleyebilirsiniz.
+        <p className="mt-2 text-sm leading-6 text-slate-500">
+          Kurum, ürün, kalan borç ve ödeme detaylarını tek akışta girin.
         </p>
       </div>
 
       {isEditingDebt && editingDebtId !== null && (
-        <p className="mb-4 rounded-xl bg-amber-100 px-3 py-2 text-sm text-amber-800">
+        <p className="mb-4 rounded-[18px] bg-amber-100 px-3 py-2 text-sm text-amber-800">
           Düzenlenen kayıt ID: {editingDebtId}
         </p>
       )}
 
       <form onSubmit={onSubmit} className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Borç Adı</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Borç Adı</label>
           <input
             type="text"
             value={debtName}
             onChange={(e) => setDebtName(e.target.value)}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: Ana kredi kartım"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Kurum</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Kurum</label>
           <select
             value={institutionSelectValue}
             onChange={(e) => {
@@ -149,7 +146,7 @@ export default function DebtForm({
               setInstitution(value);
             }}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
           >
             <option value="">Kurum seçin</option>
             {TOP_BANK_OPTIONS.map((option) => (
@@ -165,14 +162,14 @@ export default function DebtForm({
               value={institution}
               onChange={(e) => setInstitution(e.target.value)}
               disabled={addingDebt}
-              className="mt-3 w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+              className="finance-field mt-3"
               placeholder="Kurum adını girin"
             />
           )}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Ürün Tipi</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Ürün Tipi</label>
           <select
             value={productSelectValue}
             onChange={(e) => {
@@ -189,7 +186,7 @@ export default function DebtForm({
               setProductType(value);
             }}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
           >
             <option value="">Ürün tipi seçin</option>
             {PRODUCT_OPTIONS.map((option) => (
@@ -204,27 +201,27 @@ export default function DebtForm({
               value={productType}
               onChange={(e) => setProductType(e.target.value)}
               disabled={addingDebt}
-              className="mt-3 w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+              className="finance-field mt-3"
               placeholder="Ürün tipini yazın"
             />
           )}
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Toplam Borç</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Toplam Borç</label>
           <input
             type="number"
             min="0"
             value={remainingDebt}
             onChange={(e) => setRemainingDebt(e.target.value)}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: 15000"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">
             Asgari Ödeme Tutarı
           </label>
           <input
@@ -233,13 +230,13 @@ export default function DebtForm({
             value={minimumPayment}
             onChange={(e) => setMinimumPayment(e.target.value)}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: 1200"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Faiz Oranı</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Faiz Oranı</label>
           <input
             type="number"
             step="0.01"
@@ -247,13 +244,13 @@ export default function DebtForm({
             value={rate}
             onChange={(e) => setRate(e.target.value)}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: 3.99"
           />
         </div>
 
         <div>
-          <label className="mb-1 block text-sm text-gray-600">Son Ödeme Günü</label>
+          <label className="mb-1.5 block text-sm font-medium text-slate-700">Son Ödeme Günü</label>
           <input
             type="number"
             min="1"
@@ -261,12 +258,12 @@ export default function DebtForm({
             value={dueDay}
             onChange={(e) => setDueDay(e.target.value)}
             disabled={addingDebt}
-            className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+            className="finance-field"
             placeholder="Örn: 15"
           />
         </div>
 
-        <div className="md:col-span-2 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+        <div className="finance-surface-muted md:col-span-2 rounded-[24px] p-4 text-sm text-slate-600">
           Bu kayıt ödeme planı, risk görünümü ve yaklaşan ödemeler ekranında birlikte
           kullanılır. Toplam borç ve asgari ödeme alanlarını mümkün olduğunca güncel
           tutun.
@@ -276,7 +273,7 @@ export default function DebtForm({
           <button
             type="submit"
             disabled={addingDebt}
-            className="rounded-xl bg-gray-900 px-4 py-2.5 text-white transition hover:bg-gray-800 disabled:opacity-50"
+            className="finance-button-primary"
           >
             {addingDebt
               ? isEditingDebt
@@ -291,7 +288,7 @@ export default function DebtForm({
               type="button"
               onClick={onCancel}
               disabled={addingDebt}
-              className="rounded-xl border border-gray-300 px-4 py-2.5 text-gray-700 transition hover:bg-gray-100 disabled:opacity-50"
+              className="finance-button-ghost"
             >
               İptal
             </button>

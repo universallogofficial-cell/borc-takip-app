@@ -15,16 +15,17 @@ export default function SettingsPanel({
   onToggleConfirmations,
 }: SettingsPanelProps) {
   return (
-    <section className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
+    <section className="finance-panel p-6">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900">Ayarlar</h3>
-        <p className="text-sm text-gray-500">
-          Görüntüleme tercihleri ve kritik işlem korumaları tek merkezden yönetilir.
+        <p className="finance-kicker">Tercihler</p>
+        <h3 className="mt-2 text-lg font-semibold text-slate-950">Ürün ayarları</h3>
+        <p className="mt-2 text-sm text-slate-500">
+          Görüntüleme tercihleri ve kritik işlem korumaları tek merkezde tutulur.
         </p>
       </div>
 
       <div className="space-y-4">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+        <div className="finance-surface-muted rounded-[24px] p-5">
           <div className="mb-4">
             <p className="text-sm font-semibold text-gray-900">Görüntüleme</p>
             <p className="mt-1 text-sm text-gray-500">
@@ -40,7 +41,7 @@ export default function SettingsPanel({
             <select
               value={settings.currencyCode}
               onChange={(e) => onCurrencyChange(e.target.value as CurrencyCode)}
-              className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="finance-field py-2"
             >
               {currencyOptions.map((option) => (
                 <option key={option} value={option}>
@@ -51,7 +52,7 @@ export default function SettingsPanel({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-5">
+        <div className="finance-surface-muted rounded-[24px] p-5">
           <div className="mb-4">
             <p className="text-sm font-semibold text-gray-900">Güvenlik ve Onay</p>
             <p className="mt-1 text-sm text-gray-500">
@@ -60,7 +61,7 @@ export default function SettingsPanel({
             </p>
           </div>
 
-          <label className="flex items-start gap-3 rounded-xl bg-white p-4 ring-1 ring-gray-200">
+          <label className="flex items-start gap-3 rounded-[20px] bg-white p-4 ring-1 ring-slate-200">
             <input
               type="checkbox"
               checked={settings.confirmDestructiveActions}

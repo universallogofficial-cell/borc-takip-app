@@ -8,8 +8,6 @@ import BackupPanel from "@/components/BackupPanel";
 import CashForm from "@/components/CashForm";
 import OnboardingEmptyState from "@/components/OnboardingEmptyState";
 import PayoffPlanner from "@/components/PayoffPlanner";
-import RecentActivity from "@/components/RecentActivity";
-import RiskOverview from "@/components/RiskOverview";
 import SettingsPanel from "@/components/SettingsPanel";
 import UpcomingPayments from "@/components/UpcomingPayments";
 import CashPanel from "@/components/CashPanel";
@@ -47,7 +45,6 @@ import { addDebtItem } from "@/lib/debtService";
 import { createPaymentItem } from "@/lib/paymentService";
 import {
   buildCashRiskSummary,
-  buildDebtPriorityItems,
   buildMonthlyPerformanceSummary,
 } from "@/lib/riskOverview";
 import { buildUpcomingPayments } from "@/lib/upcomingPayments";
@@ -106,7 +103,7 @@ type AppWorkspaceProps = {
 };
 
 function SkeletonLine({ className }: { className: string }) {
-  return <div className={`animate-pulse rounded-xl bg-gray-200 ${className}`} />;
+  return <div className={`animate-pulse rounded-2xl bg-slate-200/80 ${className}`} />;
 }
 
 function SectionLoadingState({
@@ -117,10 +114,10 @@ function SectionLoadingState({
   description: string;
 }) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <div className="finance-panel p-5">
       <div className="mb-4">
-        <p className="text-sm font-medium text-gray-900">{title}</p>
-        <p className="text-sm text-gray-500">{description}</p>
+        <p className="text-sm font-medium text-slate-900">{title}</p>
+        <p className="text-sm text-slate-500">{description}</p>
       </div>
       <div className="space-y-3">
         <SkeletonLine className="h-16 w-full" />
@@ -134,13 +131,14 @@ function SectionLoadingState({
 function DashboardLoadingSkeleton() {
   return (
     <div className="space-y-6">
+      <SkeletonLine className="h-64 w-full" />
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <SkeletonLine className="h-32 w-full" />
-        <SkeletonLine className="h-32 w-full" />
-        <SkeletonLine className="h-32 w-full" />
-        <SkeletonLine className="h-32 w-full" />
+        <SkeletonLine className="h-28 w-full" />
+        <SkeletonLine className="h-28 w-full" />
+        <SkeletonLine className="h-28 w-full" />
+        <SkeletonLine className="h-28 w-full" />
       </div>
-      <SkeletonLine className="h-36 w-full" />
+      <SkeletonLine className="h-24 w-full" />
       <div className="grid gap-6 xl:grid-cols-2">
         <SkeletonLine className="h-72 w-full" />
         <SkeletonLine className="h-72 w-full" />
@@ -149,86 +147,85 @@ function DashboardLoadingSkeleton() {
   );
 }
 
-function FinancialSummaryCard({
+function FinancialSummaryHero({
   currencyCode,
   safeSpendableBalance,
-  thisMonthLoad,
-  thisMonthPayments,
-  upcomingCount,
-  monthEndProjection,
   riskLabel,
-  riskSummary,
+  statusNote,
 }: {
   currencyCode: CurrencyCode;
   safeSpendableBalance: number;
-  thisMonthLoad: number;
-  thisMonthPayments: number;
-  upcomingCount: number;
-  monthEndProjection: number;
   riskLabel: string;
-  riskSummary: string;
+  statusNote: string;
 }) {
   const toneClass =
     riskLabel === "Risk altındasın"
-      ? "from-red-600 via-red-500 to-orange-500"
+      ? "from-red-50 via-white to-orange-50"
       : riskLabel === "Dikkatli ol"
-        ? "from-amber-500 via-orange-400 to-yellow-400"
-        : "from-emerald-600 via-teal-500 to-sky-500";
+        ? "from-amber-50 via-white to-yellow-50"
+        : "from-emerald-50 via-white to-cyan-50";
+  const badgeClass =
+    riskLabel === "Risk altındasın"
+      ? "finance-badge finance-badge-danger"
+      : riskLabel === "Dikkatli ol"
+        ? "finance-badge finance-badge-warn"
+        : "finance-badge finance-badge-good";
 
   return (
-    <section className={`rounded-[32px] bg-gradient-to-br ${toneClass} p-6 text-white shadow-lg md:p-7`}>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">
-            Finans Özeti
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight">
+    <section className={`finance-surface-strong overflow-hidden rounded-[36px] bg-gradient-to-br ${toneClass} p-6 md:p-8`}>
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+        <div className="max-w-3xl">
+          <p className="finance-kicker">Finansal Durum</p>
+          <h2 className="mt-4 text-5xl font-semibold tracking-tight text-slate-950 md:text-6xl">
             {formatCurrency(safeSpendableBalance, currencyCode)}
           </h2>
-          <p className="mt-2 text-sm font-medium text-white/85">
-            Harcanabilir güvenli bakiye
-          </p>
-          <div className="mt-5 inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-white">
-            {riskLabel}
-          </div>
-          <p className="mt-4 max-w-2xl text-sm leading-6 text-white/85">
-            {riskSummary}
+          <p className="mt-3 text-sm font-medium text-slate-500">
+            Güvenli harcayabileceğin tutar
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-              Bu Ay Toplam Yük
-            </p>
-            <p className="mt-2 text-lg font-semibold">
-              {formatCurrency(thisMonthLoad, currencyCode)}
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-              Bu Ay Ödenen
-            </p>
-            <p className="mt-2 text-lg font-semibold">
-              {formatCurrency(thisMonthPayments, currencyCode)}
-            </p>
-          </div>
-          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-              Yaklaşan Ödeme
-            </p>
-            <p className="mt-2 text-lg font-semibold">{upcomingCount}</p>
-          </div>
-          <div className="rounded-2xl bg-white/12 p-4 ring-1 ring-white/10">
-            <p className="text-xs font-semibold uppercase tracking-wide text-white/70">
-              Ay Sonu Tahmini
-            </p>
-            <p className="mt-2 text-lg font-semibold">
-              {formatCurrency(monthEndProjection, currencyCode)}
-            </p>
-          </div>
+        <div className="flex flex-col items-start gap-3 xl:items-end">
+          <span className={badgeClass}>{riskLabel}</span>
+          <p className="max-w-sm text-sm leading-6 text-slate-600 xl:text-right">
+            {statusNote}
+          </p>
         </div>
       </div>
+    </section>
+  );
+}
+
+function DashboardMetricCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
+  return (
+    <div className="finance-surface rounded-[24px] p-4 md:p-5">
+      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
+        {label}
+      </p>
+      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+        {value}
+      </p>
+    </div>
+  );
+}
+
+function DashboardSignal({
+  title,
+  summary,
+}: {
+  title: string;
+  summary: string;
+}) {
+  return (
+    <section className="finance-surface rounded-[28px] p-5 md:p-6">
+      <p className="finance-kicker">Risk / Öneri</p>
+      <h3 className="mt-2 text-xl font-semibold text-slate-950">{title}</h3>
+      <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{summary}</p>
     </section>
   );
 }
@@ -566,7 +563,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const { items: upcomingPaymentItems, summary: upcomingPaymentSummary } =
     useMemo(() => buildUpcomingPayments(debts), [debts]);
 
-  const debtPriorities = useMemo(() => buildDebtPriorityItems(debts), [debts]);
   const cashRiskSummary = useMemo(
     () => buildCashRiskSummary(debts, currentCash),
     [currentCash, debts],
@@ -594,8 +590,15 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       }),
     [currentCash, debts, parsedPlannerBudget.value, selectedPayoffStrategy],
   );
-  const minimumPaymentTotal = monthlyPerformance.totalMinimumPaymentLoad;
   const safeSpendableBalance = cashRiskSummary.safeSpendableBalance;
+  const totalDebtBalance = useMemo(
+    () =>
+      debts.reduce(
+        (sum, item) => roundCurrency(sum + toSafeNumber(item.remaining_debt)),
+        0,
+      ),
+    [debts],
+  );
   const isDashboardLoading =
     (loadingCash || loadingDebts || loadingPayments) &&
     cashList.length === 0 &&
@@ -605,10 +608,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
   const isCashPageLoading = loadingCash && cashList.length === 0;
   const isPlannerLoading =
     (loadingCash || loadingDebts) && debts.length === 0 && cashList.length === 0;
-  const monthEndProjection = useMemo(
-    () => roundCurrency(currentCash - upcomingPaymentSummary.totalMinimumPayment),
-    [currentCash, upcomingPaymentSummary.totalMinimumPayment],
-  );
   const hasProfile = Boolean(profile.firstName.trim() && profile.lastName.trim());
   const hasCash = cashList.length > 0;
   const hasDebt = debts.length > 0;
@@ -680,30 +679,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
 
     return [...paymentActivities, ...debtActivities, ...cashActivities];
   }, [cashList, debts, paymentRows, payments]);
-
-  const recentActivities = useMemo(() => {
-    const runtimeKeys = new Set(
-      runtimeActivities.map(
-        (item) => `${item.entityType}:${item.entityId}:${item.action}`,
-      ),
-    );
-
-    return [...runtimeActivities, ...derivedActivities]
-      .filter((item) => {
-        if (item.source === "runtime") {
-          return true;
-        }
-
-        return !runtimeKeys.has(
-          `${item.entityType}:${item.entityId}:${item.action}`,
-        );
-      })
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-      )
-      .slice(0, 12);
-  }, [derivedActivities, runtimeActivities]);
 
   const handleExportCash = () => {
     try {
@@ -1051,11 +1026,11 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       : pageConfig[section];
 
   return (
-    <main className="min-h-screen bg-gray-50 p-4 md:p-6">
+    <main className="min-h-screen bg-transparent p-4 md:p-6">
       {message && (
         <div
-          className={`fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-xl px-4 py-3 text-sm font-medium text-white shadow-lg ${
-            message.type === "error" ? "bg-red-500" : "bg-green-500"
+          className={`finance-toast fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-[18px] px-4 py-3 text-sm font-medium ${
+            message.type === "error" ? "finance-toast-error" : "finance-toast-success"
           }`}
         >
           {message.text}
@@ -1063,28 +1038,28 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       )}
 
       <div className="mx-auto max-w-7xl space-y-6">
-        <div className="flex flex-col gap-3 rounded-[28px] border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
+        <div className="finance-panel flex flex-col gap-4 rounded-[30px] p-4 sm:flex-row sm:items-center sm:justify-between md:px-5 md:py-5">
           <div className="min-w-0">
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-semibold text-slate-950">
               {displayName}
             </p>
-            <p className="mt-1 text-xs text-gray-500">
+            <p className="mt-1 text-xs text-slate-500">
               {getAuthModeLabel(authContext)} • Para birimi: {settings.currencyCode} •
               Veriler bu hesaba özeldir
             </p>
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-slate-400">
               Verileriniz oturum bazında ayrılır ve yalnızca bu hesap kapsamında gösterilir.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-800">
+            <span className="finance-badge finance-badge-good">
               Oturum açık
             </span>
             <button
               type="button"
               onClick={handleSignOut}
-              className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 active:scale-[0.99]"
+              className="finance-button-ghost"
             >
               Çıkış Yap
             </button>
@@ -1116,67 +1091,82 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
               />
             ) : (
               <>
-                <FinancialSummaryCard
+                <FinancialSummaryHero
                   currencyCode={settings.currencyCode}
                   safeSpendableBalance={safeSpendableBalance}
-                  thisMonthLoad={minimumPaymentTotal}
-                  thisMonthPayments={thisMonthPaymentAmount}
-                  upcomingCount={upcomingPaymentSummary.urgentCount}
-                  monthEndProjection={monthEndProjection}
                   riskLabel={cashRiskSummary.statusLabel}
-                  riskSummary={cashRiskSummary.summaryText}
+                  statusNote={
+                    cashRiskSummary.isInsufficient
+                      ? "Mevcut görünümde nakit akışı baskı altında."
+                      : cashRiskSummary.warnings.length > 0
+                        ? "Mevcut durumda finansal denge dikkat istiyor."
+                        : "Mevcut durumda finansal denge stabil."
+                  }
                 />
 
-                <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
-                  <div className="mb-4">
-                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
-                      Hızlı Geçiş
-                    </p>
-                    <h3 className="mt-2 text-xl font-semibold text-gray-900">
-                      Hızlı Aksiyonlar
-                    </h3>
-                    <p className="mt-2 text-sm leading-6 text-gray-500">
-                      Yönetim işlemlerine ilgili sayfalardan doğrudan geçin.
-                    </p>
-                  </div>
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  <DashboardMetricCard
+                    label="Bu Ay Toplam Borç"
+                    value={formatCurrency(totalDebtBalance, settings.currencyCode)}
+                  />
+                  <DashboardMetricCard
+                    label="Yaklaşan Ödeme"
+                    value={String(upcomingPaymentSummary.urgentCount)}
+                  />
+                  <DashboardMetricCard
+                    label="Toplam Nakit"
+                    value={formatCurrency(currentCash, settings.currencyCode)}
+                  />
+                  <DashboardMetricCard
+                    label="Bu Ay Ödenen"
+                    value={formatCurrency(thisMonthPaymentAmount, settings.currencyCode)}
+                  />
+                </div>
 
-                  <div className="flex flex-wrap gap-3">
+                <section className="finance-surface rounded-[28px] p-5 md:p-6">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+                    <div>
+                      <p className="finance-kicker">Ana Aksiyonlar</p>
+                      <h3 className="mt-2 text-xl font-semibold text-slate-950">
+                        Bir sonraki adımı seç
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap gap-3">
                     <Link
                       href="/app/debts"
-                      className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 active:scale-[0.99]"
+                      className="finance-button-primary"
                     >
                       Borç Ekle
                     </Link>
                     <Link
                       href="/app/payments"
-                      className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-[0.99]"
+                      className="finance-button-secondary"
                     >
                       Ödeme Yap
                     </Link>
                     <Link
                       href="/app/cash"
-                      className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 active:scale-[0.99]"
+                      className="finance-button-ghost"
                     >
                       Kasa Ekle
                     </Link>
+                    </div>
                   </div>
                 </section>
 
-                <RiskOverview
-                  priorities={debtPriorities}
-                  cashRisk={cashRiskSummary}
-                  performance={monthlyPerformance}
-                  currencyCode={settings.currencyCode}
+                <DashboardSignal
+                  title={cashRiskSummary.statusLabel}
+                  summary={
+                    cashRiskSummary.warnings.length > 0
+                      ? cashRiskSummary.warnings[0]
+                      : cashRiskSummary.summaryText
+                  }
                 />
 
                 <UpcomingPayments
                   items={upcomingPaymentItems.slice(0, 5)}
                   summary={upcomingPaymentSummary}
-                  currencyCode={settings.currencyCode}
-                />
-
-                <RecentActivity
-                  activities={recentActivities.slice(0, 5)}
                   currencyCode={settings.currencyCode}
                 />
               </>

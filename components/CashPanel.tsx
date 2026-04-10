@@ -24,17 +24,18 @@ export default function CashPanel({
   onDeleteCash,
 }: CashPanelProps) {
   return (
-    <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
+    <div className="finance-panel p-5 md:p-6">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-gray-900">Nakit Alanı</h3>
-          <p className="text-sm text-gray-500">
-            Kasa bakiyelerini arayın, dışa aktarın ve düzenleyin.
+          <p className="finance-kicker">Kasalar</p>
+          <h3 className="mt-2 text-xl font-semibold text-slate-950">Nakit görünümü</h3>
+          <p className="mt-2 text-sm leading-6 text-slate-500">
+            Kasalarını ara, dışa aktar ve güncel bakiyeyi tek akışta izle.
           </p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:flex-wrap">
           <div className="w-full sm:min-w-72">
-            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-gray-500">
+            <label className="mb-1 block text-xs font-medium uppercase tracking-wide text-slate-500">
               Arama
             </label>
             <input
@@ -42,36 +43,39 @@ export default function CashPanel({
               value={cashSearch}
               onChange={(e) => onCashSearchChange(e.target.value)}
               placeholder="Kasa adı veya not ara"
-              className="w-full rounded-xl border border-gray-300 px-3 py-2 text-sm outline-none focus:border-gray-500"
+              className="finance-field py-2"
             />
           </div>
           <button
             type="button"
             onClick={onExportCash}
             disabled={cashList.length === 0}
-            className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50 sm:self-end"
+            className="finance-button-ghost sm:self-end"
           >
             CSV Dışa Aktar
           </button>
         </div>
       </div>
 
-      <div className="mb-4 rounded-2xl bg-gray-50 p-4">
-        <p className="text-sm text-gray-500">Toplam Nakit</p>
-        <p className="mt-2 text-3xl font-bold text-gray-900">
+      <div className="mb-5 rounded-[26px] bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-white shadow-[0_24px_50px_rgba(15,23,42,0.18)]">
+        <p className="text-sm text-white/65">Toplam Nakit</p>
+        <p className="mt-2 text-3xl font-semibold tracking-tight">
           {formatCurrency(currentCash, currencyCode)}
+        </p>
+        <p className="mt-2 text-sm text-white/75">
+          Kasalarındaki kullanılabilir toplam bakiyeyi gösterir.
         </p>
       </div>
 
       <div className="space-y-3">
         {cashList.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-300 p-6 text-center">
-            <p className="text-sm font-medium text-gray-900">
+          <div className="finance-empty p-6 text-center">
+            <p className="text-sm font-medium text-slate-900">
               {cashSearch.trim()
                 ? "Aramanıza uygun kasa kaydı yok."
                 : "Henüz kasa kaydı bulunmuyor."}
             </p>
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-sm text-slate-500">
               {cashSearch.trim()
                 ? "Arama ifadesini temizleyin veya yeni kasa oluşturun."
                 : "İlk kasa kaydını oluşturarak ödeme akışını başlatın."}
@@ -81,7 +85,7 @@ export default function CashPanel({
                 <button
                   type="button"
                   onClick={() => onCashSearchChange("")}
-                  className="rounded-xl border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:bg-gray-100"
+                  className="finance-button-ghost"
                 >
                   Aramayı Temizle
                 </button>
@@ -89,7 +93,7 @@ export default function CashPanel({
               <Link
                 href="/app/cash"
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700"
+                className="finance-button-secondary"
               >
                 Yeni Kasa Ekle
               </Link>
@@ -99,33 +103,33 @@ export default function CashPanel({
           cashList.map((cash) => (
             <div
               key={cash.id}
-              className="rounded-xl border border-gray-200 p-4"
+              className="rounded-[24px] border border-slate-200/80 bg-white/90 p-4 shadow-sm"
             >
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0 flex-1">
-                  <p className="break-words font-medium text-gray-900">{cash.name}</p>
-                  <p className="break-words text-sm text-gray-500">
+                  <p className="break-words font-medium text-slate-950">{cash.name}</p>
+                  <p className="break-words text-sm text-slate-500">
                     {cash.note || "Not yok"}
                   </p>
                 </div>
 
                 <div className="text-left sm:text-right">
-                  <p className="text-sm text-gray-500">Bakiye</p>
-                  <p className="font-semibold text-gray-900">
+                  <p className="text-sm text-slate-500">Bakiye</p>
+                  <p className="font-semibold text-slate-950">
                     {formatCurrency(Number(cash.balance), currencyCode)}
                   </p>
                   <div className="mt-2 flex flex-wrap justify-start gap-2 sm:justify-end">
                     <button
                       type="button"
                       onClick={() => onEditCash(cash)}
-                      className="rounded-lg bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
+                      className="finance-button-ghost rounded-xl px-3 py-2"
                     >
                       Düzenle
                     </button>
                     <button
                       type="button"
                       onClick={() => onDeleteCash(cash.id)}
-                      className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
+                      className="finance-button-danger rounded-xl px-3 py-2"
                     >
                       Sil
                     </button>

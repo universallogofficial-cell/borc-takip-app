@@ -28,27 +28,27 @@ export default function PayoffPlanner({
   const leadRecommendation = scenario.recommendations[0] ?? null;
 
   return (
-    <section className="rounded-[28px] bg-white p-5 shadow-sm ring-1 ring-gray-200 md:p-6">
+    <section className="finance-panel p-5 md:p-6">
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+          <p className="finance-kicker">
             Borç Kapatma Stratejisi
           </p>
-          <h3 className="mt-2 text-xl font-semibold text-gray-900">
+          <h3 className="mt-2 text-xl font-semibold text-slate-950">
             Öncelikli borcu netleştirin
           </h3>
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-500">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
             Seçilen stratejiye göre önce hangi borcu düşünmeniz gerektiğini görün.
             Bu alan yalnızca karar desteği sunar, otomatik ödeme işlemi başlatmaz.
           </p>
         </div>
-        <span className="rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-800">
+        <span className="finance-badge finance-badge-neutral">
           {scenario.strategyTag}
         </span>
       </div>
 
       <div className="mb-5 grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-        <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <div className="finance-surface-muted rounded-[24px] p-4">
           <div className="grid gap-3 md:grid-cols-2">
             <div>
               <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -57,7 +57,7 @@ export default function PayoffPlanner({
               <select
                 value={strategy}
                 onChange={(e) => onStrategyChange(e.target.value as PayoffStrategy)}
-                className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                className="finance-field"
               >
                 {payoffStrategyOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -78,7 +78,7 @@ export default function PayoffPlanner({
                 value={extraBudget}
                 onChange={(e) => onExtraBudgetChange(e.target.value)}
                 placeholder="Örn: 1000"
-                className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm outline-none transition focus:border-gray-500"
+                className="finance-field"
               />
             </div>
           </div>
@@ -89,7 +89,7 @@ export default function PayoffPlanner({
             </div>
           )}
 
-          <div className="mt-4 rounded-2xl bg-white p-4 ring-1 ring-gray-200">
+            <div className="mt-4 rounded-[22px] bg-white p-4 ring-1 ring-slate-200">
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
               Plan Yorumu
             </p>
@@ -102,7 +102,7 @@ export default function PayoffPlanner({
           </div>
         </div>
 
-        <div className="rounded-2xl border border-gray-200 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 text-white shadow-sm">
+        <div className="rounded-[26px] border border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 p-5 text-white shadow-[0_28px_60px_rgba(15,23,42,0.18)]">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
             Önce Değerlendirin
           </p>
@@ -147,7 +147,7 @@ export default function PayoffPlanner({
       </div>
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-        <div className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm">
+        <div className="finance-stat-card transition hover:-translate-y-0.5 hover:shadow-sm">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">Strateji</p>
           <p className="mt-2 font-semibold text-gray-900">{scenario.strategyLabel}</p>
         </div>
@@ -183,7 +183,7 @@ export default function PayoffPlanner({
         </div>
       </div>
 
-      <div className="mb-5 rounded-2xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+      <div className="finance-surface-muted mb-5 rounded-[24px] p-4 text-sm text-slate-600">
         <div className="grid gap-3 sm:grid-cols-3">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
@@ -213,7 +213,7 @@ export default function PayoffPlanner({
       </div>
 
       {scenario.recommendations.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-gray-300 p-5 text-sm text-gray-500">
+        <div className="finance-empty p-5 text-sm text-slate-500">
           Planlanacak aktif borç kaydı yok.
         </div>
       ) : (
@@ -221,7 +221,7 @@ export default function PayoffPlanner({
           {scenario.recommendations.map((item, index) => (
             <div
               key={item.id}
-              className="rounded-2xl border border-gray-200 bg-white p-4 transition hover:-translate-y-0.5 hover:shadow-sm"
+                className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
             >
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
