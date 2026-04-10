@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { updateCashItem } from "@/lib/cashService";
 import { updateDebtItem } from "@/lib/debtService";
+import { getErrorMessage } from "@/lib/errorMessage";
 import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
 import {
   buildPaymentDeletePlans,
@@ -98,7 +99,10 @@ export function usePaymentManager({
     } catch (error) {
       console.error("Payment verisi alınamadı:", error);
       setPayments([]);
-      onMessage("Ödeme verisi alınamadı.", "error");
+      onMessage(
+        `Ödeme verisi alınamadı: ${getErrorMessage(error, "Bilinmeyen hata")}`,
+        "error",
+      );
     } finally {
       setLoadingPayments(false);
     }
@@ -371,6 +375,11 @@ export function usePaymentManager({
 
   const handleAddPayment = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.info("[payment-manager] handleAddPayment:submit", {
+      isEditingPayment: editingPaymentId !== null,
+      editingPaymentId,
+      userId: userId ?? null,
+    });
 
     if (addingPayment) {
       return;
@@ -386,6 +395,7 @@ export function usePaymentManager({
       return;
     }
     const selection = selectionResult.data;
+    console.info("[payment-manager] handleAddPayment:selection", selection);
 
     const existingPayment =
       editingPaymentId === null
@@ -408,6 +418,18 @@ export function usePaymentManager({
       return;
     }
     const updatePlans = updatePlanResult.data;
+    console.info("[payment-manager] handleAddPayment:updatePlans", {
+      debtPlans: updatePlans.debtPlans.map((plan) => ({
+        debtId: plan.debt.id,
+        originalRemainingDebt: plan.originalRemainingDebt,
+        nextRemainingDebt: plan.nextRemainingDebt,
+      })),
+      cashPlans: updatePlans.cashPlans.map((plan) => ({
+        cashId: plan.cash.id,
+        originalBalance: plan.originalBalance,
+        nextBalance: plan.nextBalance,
+      })),
+    });
 
     setAddingPayment(true);
 
@@ -458,12 +480,18 @@ export function usePaymentManager({
       let appliedCashIds: number[] = [];
 
       try {
-        const createdPayment = await createPaymentItem({
+        const paymentPayload = {
           debt_id: selection.debtId,
           cash_id: selection.cashId,
           amount: selection.amount,
           note: selection.note,
-        }, scopeOptions);
+        };
+        console.info("[payment-manager] handleAddPayment:payload", {
+          payload: paymentPayload,
+          scopeOptions,
+        });
+
+        const createdPayment = await createPaymentItem(paymentPayload, scopeOptions);
 
         createdPaymentId = createdPayment.id;
 
@@ -513,7 +541,9 @@ export function usePaymentManager({
       console.error("Payment kayıt hatası:", error);
       await refreshPaymentDependencies();
       onMessage(
-        existingPayment ? "Ödeme güncellenemedi." : "Ödeme kaydedilemedi.",
+        existingPayment
+          ? `Ödeme güncellenemedi: ${getErrorMessage(error, "Bilinmeyen hata")}`
+          : `Ödeme kaydedilemedi: ${getErrorMessage(error, "Bilinmeyen hata")}`,
         "error",
       );
     } finally {
@@ -616,7 +646,10 @@ export function usePaymentManager({
     } catch (error) {
       console.error("Payment silme hatası:", error);
       await refreshPaymentDependencies();
-      onMessage("Ödeme silinemedi.", "error");
+      onMessage(
+        `Ödeme silinemedi: ${getErrorMessage(error, "Bilinmeyen hata")}`,
+        "error",
+      );
     } finally {
       setDeletingPaymentId(null);
     }
