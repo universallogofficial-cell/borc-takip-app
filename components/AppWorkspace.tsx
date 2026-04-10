@@ -403,8 +403,12 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     onActivity: recordActivity,
     confirmDestructiveActions: settings.confirmDestructiveActions,
     userId: authContext.userId,
-    refreshCash: fetchCash,
-    refreshDebts: fetchDebts,
+    refreshCash: async () => {
+      await fetchCash();
+    },
+    refreshDebts: async () => {
+      await fetchDebts();
+    },
   });
 
   const loadInitialData = useEffectEvent(() => {
