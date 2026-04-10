@@ -3,12 +3,10 @@ import type {
   CurrencyCode,
   UpcomingPaymentItem,
   UpcomingPaymentStatus,
-  UpcomingPaymentSummary,
 } from "@/types/finance";
 
 type UpcomingPaymentsProps = {
   items: UpcomingPaymentItem[];
-  summary: UpcomingPaymentSummary;
   currencyCode: CurrencyCode;
 };
 
@@ -39,18 +37,9 @@ export default function UpcomingPayments({
   currencyCode,
 }: UpcomingPaymentsProps) {
   return (
-    <section className="finance-panel p-5 md:p-6">
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <p className="finance-kicker">Takvim</p>
-          <h3 className="mt-2 text-lg font-semibold text-slate-950">
-            Yaklaşan Ödemeler
-          </h3>
-          <p className="mt-2 text-sm text-slate-500">
-            Önündeki ödemeleri sade bir liste görünümünde izle.
-          </p>
-        </div>
-        <span className="finance-badge finance-badge-neutral">{items.length} kayıt</span>
+    <section className="mx-auto w-full max-w-4xl">
+      <div className="mb-6">
+        <p className="finance-kicker">Yaklaşan Ödemeler</p>
       </div>
 
       {items.length === 0 ? (
@@ -58,37 +47,30 @@ export default function UpcomingPayments({
           Henüz yaklaşan ödeme kaydı bulunmuyor.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {items.map((item) => {
             const status = statusConfig[item.status];
 
             return (
               <div
                 key={item.id}
-                className="rounded-[24px] border border-slate-200/80 bg-white/92 p-4 shadow-sm"
+                className="finance-surface flex flex-col gap-3 rounded-[24px] px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
               >
-                <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
-                  <div className="min-w-0 flex-1">
-                    <p className="break-words font-medium text-gray-900">
-                      {item.debtName}
-                    </p>
-                    <p className="break-words text-sm text-gray-500">
-                      {item.institution}
-                    </p>
-                    <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-600">
-                      <span>Son ödeme günü: {item.dueDay}</span>
-                      <span>
-                        Minimum ödeme: {formatCurrency(item.minimumPayment, currencyCode)}
-                      </span>
-                      <span>
-                        Kalan borç: {formatCurrency(item.remainingDebt, currencyCode)}
-                      </span>
-                    </div>
+                <div className="min-w-0 flex-1">
+                  <p className="break-words text-base font-medium text-slate-950">
+                    {item.debtName}
+                  </p>
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+                    <span>{item.institution}</span>
+                    <span>Gün {item.dueDay}</span>
                   </div>
+                </div>
 
-                  <span
-                    className={`finance-badge ${status.className}`}
-                  >
+                <div className="flex items-center justify-between gap-3 sm:justify-end">
+                  <p className="text-base font-semibold text-slate-950">
+                    {formatCurrency(item.minimumPayment, currencyCode)}
+                  </p>
+                  <span className={`finance-badge ${status.className}`}>
                     {status.label}
                   </span>
                 </div>

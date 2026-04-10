@@ -130,19 +130,13 @@ function SectionLoadingState({
 
 function DashboardLoadingSkeleton() {
   return (
-    <div className="space-y-6">
-      <SkeletonLine className="h-64 w-full" />
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <SkeletonLine className="h-28 w-full" />
-        <SkeletonLine className="h-28 w-full" />
-        <SkeletonLine className="h-28 w-full" />
-        <SkeletonLine className="h-28 w-full" />
+    <div className="space-y-12">
+      <SkeletonLine className="h-80 w-full" />
+      <div className="grid gap-4 sm:grid-cols-2">
+        <SkeletonLine className="h-24 w-full" />
+        <SkeletonLine className="h-24 w-full" />
       </div>
-      <SkeletonLine className="h-24 w-full" />
-      <div className="grid gap-6 xl:grid-cols-2">
-        <SkeletonLine className="h-72 w-full" />
-        <SkeletonLine className="h-72 w-full" />
-      </div>
+      <SkeletonLine className="h-72 w-full" />
     </div>
   );
 }
@@ -152,11 +146,15 @@ function FinancialSummaryHero({
   safeSpendableBalance,
   riskLabel,
   statusNote,
+  totalDebt,
+  urgentCount,
 }: {
   currencyCode: CurrencyCode;
   safeSpendableBalance: number;
   riskLabel: string;
   statusNote: string;
+  totalDebt: number;
+  urgentCount: number;
 }) {
   const toneClass =
     riskLabel === "Risk altındasın"
@@ -172,60 +170,57 @@ function FinancialSummaryHero({
         : "finance-badge finance-badge-good";
 
   return (
-    <section className={`finance-surface-strong overflow-hidden rounded-[36px] bg-gradient-to-br ${toneClass} p-6 md:p-8`}>
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-start">
+    <section
+      className={`finance-surface-strong overflow-hidden rounded-[40px] bg-gradient-to-br ${toneClass} px-6 py-8 md:px-8 md:py-10`}
+    >
+      <div className="grid gap-10">
         <div className="max-w-3xl">
           <p className="finance-kicker">Finansal Durum</p>
-          <h2 className="mt-4 text-5xl font-semibold tracking-tight text-slate-950 md:text-6xl">
+          <h2 className="mt-4 text-6xl font-semibold tracking-tight text-slate-950 md:text-7xl">
             {formatCurrency(safeSpendableBalance, currencyCode)}
           </h2>
           <p className="mt-3 text-sm font-medium text-slate-500">
             Güvenli harcayabileceğin tutar
           </p>
+
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link href="/app/payments" className="finance-button-primary">
+              Ödeme Yap
+            </Link>
+            <Link href="/app/debts" className="finance-button-secondary">
+              Borç ekle
+            </Link>
+          </div>
         </div>
 
-        <div className="flex flex-col items-start gap-3 xl:items-end">
-          <span className={badgeClass}>{riskLabel}</span>
-          <p className="max-w-sm text-sm leading-6 text-slate-600 xl:text-right">
-            {statusNote}
-          </p>
+        <div className="flex flex-wrap items-start justify-between gap-6">
+          <div className="flex flex-col items-start gap-3">
+            <span className={badgeClass}>{riskLabel}</span>
+            <p className="max-w-md text-sm leading-6 text-slate-600">
+              {statusNote}
+            </p>
+          </div>
+
+          <div className="grid w-full gap-3 sm:max-w-md sm:grid-cols-2">
+            <div className="rounded-[22px] bg-white/72 px-4 py-4 backdrop-blur-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Yaklaşan ödeme
+              </p>
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+                {urgentCount}
+              </p>
+            </div>
+            <div className="rounded-[22px] bg-white/72 px-4 py-4 backdrop-blur-sm">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                Bu ay toplam borç
+              </p>
+              <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
+                {formatCurrency(totalDebt, currencyCode)}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
-    </section>
-  );
-}
-
-function DashboardMetricCard({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="finance-surface rounded-[24px] p-4 md:p-5">
-      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-400">
-        {label}
-      </p>
-      <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-        {value}
-      </p>
-    </div>
-  );
-}
-
-function DashboardSignal({
-  title,
-  summary,
-}: {
-  title: string;
-  summary: string;
-}) {
-  return (
-    <section className="finance-surface rounded-[28px] p-5 md:p-6">
-      <p className="finance-kicker">Risk / Öneri</p>
-      <h3 className="mt-2 text-xl font-semibold text-slate-950">{title}</h3>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-600">{summary}</p>
     </section>
   );
 }
@@ -1066,7 +1061,9 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
           </div>
         </div>
 
-        <PageHeader title={currentPage.title} subtitle={currentPage.subtitle} />
+        {section !== "dashboard" ? (
+          <PageHeader title={currentPage.title} subtitle={currentPage.subtitle} />
+        ) : null}
 
         {section === "dashboard" && (
           <>
@@ -1090,7 +1087,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
                 hasPayment={hasPayment}
               />
             ) : (
-              <>
+              <div className="space-y-14">
                 <FinancialSummaryHero
                   currencyCode={settings.currencyCode}
                   safeSpendableBalance={safeSpendableBalance}
@@ -1102,74 +1099,15 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
                         ? "Mevcut durumda finansal denge dikkat istiyor."
                         : "Mevcut durumda finansal denge stabil."
                   }
-                />
-
-                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  <DashboardMetricCard
-                    label="Bu Ay Toplam Borç"
-                    value={formatCurrency(totalDebtBalance, settings.currencyCode)}
-                  />
-                  <DashboardMetricCard
-                    label="Yaklaşan Ödeme"
-                    value={String(upcomingPaymentSummary.urgentCount)}
-                  />
-                  <DashboardMetricCard
-                    label="Toplam Nakit"
-                    value={formatCurrency(currentCash, settings.currencyCode)}
-                  />
-                  <DashboardMetricCard
-                    label="Bu Ay Ödenen"
-                    value={formatCurrency(thisMonthPaymentAmount, settings.currencyCode)}
-                  />
-                </div>
-
-                <section className="finance-surface rounded-[28px] p-5 md:p-6">
-                  <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                    <div>
-                      <p className="finance-kicker">Ana Aksiyonlar</p>
-                      <h3 className="mt-2 text-xl font-semibold text-slate-950">
-                        Bir sonraki adımı seç
-                      </h3>
-                    </div>
-
-                    <div className="flex flex-wrap gap-3">
-                    <Link
-                      href="/app/debts"
-                      className="finance-button-primary"
-                    >
-                      Borç Ekle
-                    </Link>
-                    <Link
-                      href="/app/payments"
-                      className="finance-button-secondary"
-                    >
-                      Ödeme Yap
-                    </Link>
-                    <Link
-                      href="/app/cash"
-                      className="finance-button-ghost"
-                    >
-                      Kasa Ekle
-                    </Link>
-                    </div>
-                  </div>
-                </section>
-
-                <DashboardSignal
-                  title={cashRiskSummary.statusLabel}
-                  summary={
-                    cashRiskSummary.warnings.length > 0
-                      ? cashRiskSummary.warnings[0]
-                      : cashRiskSummary.summaryText
-                  }
+                  totalDebt={totalDebtBalance}
+                  urgentCount={upcomingPaymentSummary.urgentCount}
                 />
 
                 <UpcomingPayments
                   items={upcomingPaymentItems.slice(0, 5)}
-                  summary={upcomingPaymentSummary}
                   currencyCode={settings.currencyCode}
                 />
-              </>
+              </div>
             )}
           </>
         )}
