@@ -1042,7 +1042,13 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     );
   }
 
-  const currentPage = pageConfig[section];
+  const currentPage =
+    section === "dashboard" && shouldShowOnboarding
+      ? {
+          title: "Hoş geldin",
+          subtitle: "Borçlarını ve nakit durumunu yönetmeye başla.",
+        }
+      : pageConfig[section];
 
   return (
     <main className="min-h-screen bg-gray-50 p-4 md:p-6">
@@ -1136,19 +1142,19 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
 
                   <div className="flex flex-wrap gap-3">
                     <Link
-                      href="/debts"
+                      href="/app/debts"
                       className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 active:scale-[0.99]"
                     >
                       Borç Ekle
                     </Link>
                     <Link
-                      href="/payments"
+                      href="/app/payments"
                       className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700 active:scale-[0.99]"
                     >
                       Ödeme Yap
                     </Link>
                     <Link
-                      href="/cash"
+                      href="/app/cash"
                       className="rounded-xl bg-green-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-green-700 active:scale-[0.99]"
                     >
                       Kasa Ekle

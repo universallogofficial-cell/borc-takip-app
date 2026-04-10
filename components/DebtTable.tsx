@@ -144,7 +144,7 @@ export default function DebtTable({
                       </button>
                     )}
                     <Link
-                      href="/debts"
+                      href="/app/debts"
                       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                       className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800"
                     >

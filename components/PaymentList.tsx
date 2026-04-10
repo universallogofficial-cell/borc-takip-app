@@ -238,7 +238,7 @@ export default function PaymentList({
               </button>
             )}
             <Link
-              href="/payments"
+              href="/app/payments"
               onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
               className="rounded-xl bg-blue-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-blue-700"
             >

@@ -4,11 +4,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
-  { href: "/", label: "Dashboard" },
-  { href: "/debts", label: "Borçlar" },
-  { href: "/cash", label: "Kasalar" },
-  { href: "/payments", label: "Ödemeler" },
-  { href: "/settings", label: "Ayarlar" },
+  { href: "/app", label: "Dashboard" },
+  { href: "/app/debts", label: "Borçlar" },
+  { href: "/app/cash", label: "Kasalar" },
+  { href: "/app/payments", label: "Ödemeler" },
+  { href: "/app/settings", label: "Ayarlar" },
 ];
 
 function getLinkClass(isActive: boolean) {

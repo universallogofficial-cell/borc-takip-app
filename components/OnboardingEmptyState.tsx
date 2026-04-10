@@ -20,6 +20,7 @@ type OnboardingStep = {
   href?: string;
   done: boolean;
   unlocked: boolean;
+  shortLabel: string;
 };
 
 function StepCard({
@@ -30,13 +31,24 @@ function StepCard({
   index: number;
 }) {
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-gray-200 bg-gray-50 p-5 text-left">
+    <div
+      className={`flex h-full flex-col rounded-[24px] border p-5 text-left shadow-sm transition ${
+        step.done
+          ? "border-emerald-200 bg-emerald-50/70"
+          : step.unlocked
+            ? "border-sky-200 bg-white"
+            : "border-gray-200 bg-gray-50"
+      }`}
+    >
       <div className="flex items-center justify-between gap-3">
-        <p className="text-sm font-semibold text-gray-900">
-          {index + 1}. {step.title}
-        </p>
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-400">
+            Adım {index + 1}
+          </p>
+          <p className="mt-1 text-base font-semibold text-gray-900">{step.title}</p>
+        </div>
         <span
-          className={`rounded-full px-2.5 py-1 text-xs font-medium ${
+          className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium ${
             step.done
               ? "bg-emerald-100 text-emerald-800"
               : step.unlocked
@@ -83,6 +95,12 @@ export default function OnboardingEmptyState({
   hasDebt,
   hasPayment,
 }: OnboardingEmptyStateProps) {
+  const hasAnyName = Boolean(firstName.trim() || lastName.trim());
+  const greetingName = hasProfile
+    ? `${firstName.trim()} ${lastName.trim()}`
+    : hasAnyName
+      ? `${firstName.trim()} ${lastName.trim()}`.trim()
+      : "hoş geldin";
   const steps: OnboardingStep[] = [
     {
       title: "Profil oluştur",
@@ -91,70 +109,126 @@ export default function OnboardingEmptyState({
       cta: hasProfile ? "Profil tamamlandı" : "Adınızı kaydedin",
       done: hasProfile,
       unlocked: true,
+      shortLabel: "Profil",
     },
     {
       title: "İlk kasanı ekle",
       description:
         "Tüm planlama ve güvenli bakiye görünümü bu adımdan sonra anlamlı hale gelir.",
       cta: "Kasalar sayfasına git",
-      href: "/cash",
+      href: "/app/cash",
       done: hasCash,
       unlocked: hasProfile,
+      shortLabel: "Kasa",
     },
     {
       title: "İlk borcunu ekle",
       description:
         "Borç, vade ve asgari ödeme bilgileri risk görünümü ile öncelik motorunu besler.",
       cta: "Borçlar sayfasına git",
-      href: "/debts",
+      href: "/app/debts",
       done: hasDebt,
       unlocked: hasProfile && hasCash,
+      shortLabel: "Borç",
     },
     {
       title: "İlk ödemeni yap",
       description:
         "Ödeme kaydı ile hareket geçmişi, ay görünümü ve durum takibi gerçek veriye dönüşür.",
       cta: "Ödemeler sayfasına git",
-      href: "/payments",
+      href: "/app/payments",
       done: hasPayment,
       unlocked: hasProfile && hasCash && hasDebt,
+      shortLabel: "Ödeme",
     },
   ];
+  const completedStepCount = steps.filter((step) => step.done).length;
+  const completionRate = Math.round((completedStepCount / steps.length) * 100);
+  const currentStep =
+    steps.find((step) => step.unlocked && !step.done) ?? steps[steps.length - 1];
+  const currentStepIndex = steps.findIndex((step) => step.title === currentStep.title);
 
   return (
-    <section className="rounded-[32px] bg-white px-6 py-8 shadow-sm ring-1 ring-gray-200 md:px-8 md:py-10">
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
-            Karşılama
-          </p>
-          <h2 className="mt-2 text-3xl font-semibold tracking-tight text-gray-900">
-            Başlamak için ilk verilerinizi ekleyin
+    <section className="rounded-[32px] bg-white px-5 py-8 shadow-sm ring-1 ring-gray-200 md:px-8 md:py-10">
+      <div className="mx-auto max-w-5xl space-y-6">
+        <div className="rounded-[28px] border border-gray-200 bg-[linear-gradient(180deg,#ffffff_0%,#f8fafc_100%)] px-5 py-8 text-center md:px-8">
+          <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-800">
+            Yeni Kullanıcı Kurulumu
+          </span>
+          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 md:text-4xl">
+            {hasProfile ? `${greetingName}, hazırsın.` : "Hoş geldin"}
           </h2>
-          <p className="mt-3 max-w-2xl text-sm leading-6 text-gray-600">
-            Bu kurulum akışı tamamlandığında uygulama size sadece kayıtları değil,
-            paranın yönünü, risk durumunu ve öncelikli adımları gösterecek.
+          <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-600 md:text-base">
+            Borçlarını ve nakit durumunu yönetmeye başla. İlk dört adımı tamamladığında
+            dashboard gerçek durumunu, risklerini ve sonraki hareketlerini net şekilde
+            gösterecek.
           </p>
-          <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
-            <p className="text-sm font-medium text-gray-900">
-              {hasProfile
-                ? `${firstName} ${lastName}, hoş geldiniz.`
-                : "İlk olarak kısa profilinizi tamamlayın."}
-            </p>
-            <p className="mt-1 text-sm text-gray-500">
-              {email || "Bu oturum"} için kayıtlı ilerleme yalnızca bu hesapta görünür.
-            </p>
+          <div className="mx-auto mt-6 grid max-w-3xl gap-3 text-left sm:grid-cols-3">
+            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                İlerleme
+              </p>
+              <p className="mt-2 text-2xl font-semibold text-gray-900">
+                {completedStepCount}/{steps.length}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">adım tamamlandı</p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Şu An
+              </p>
+              <p className="mt-2 text-lg font-semibold text-gray-900">
+                {currentStep.shortLabel}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                Adım {currentStepIndex + 1} aktif
+              </p>
+            </div>
+            <div className="rounded-2xl border border-gray-200 bg-white p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Hesap
+              </p>
+              <p className="mt-2 truncate text-lg font-semibold text-gray-900">
+                {email || "Bu oturum"}
+              </p>
+              <p className="mt-1 text-sm text-gray-500">
+                İlerleme yalnızca bu hesapta görünür
+              </p>
+            </div>
           </div>
+          <div className="mx-auto mt-6 max-w-2xl">
+            <div className="h-2 rounded-full bg-gray-200">
+              <div
+                className="h-2 rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 transition-all"
+                style={{ width: `${completionRate}%` }}
+              />
+            </div>
+            <p className="mt-2 text-sm text-gray-500">%{completionRate} tamamlandı</p>
+          </div>
+        </div>
 
-          {!hasProfile && (
-            <form onSubmit={onSaveProfile} className="mt-5 grid gap-3 sm:grid-cols-2">
+        {!hasProfile ? (
+          <div className="mx-auto max-w-3xl rounded-[28px] border border-gray-200 bg-gray-50 p-5 shadow-sm md:p-6">
+            <div className="text-center">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-400">
+                Adım 1
+              </p>
+              <h3 className="mt-2 text-2xl font-semibold text-gray-900">
+                İlk olarak seni tanıyalım
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                İsim ve soyisim bilgisi eklendiğinde onboarding akışı kişisel hale gelir
+                ve sonraki adımlar açılır.
+              </p>
+            </div>
+            <form onSubmit={onSaveProfile} className="mt-6 grid gap-3 sm:grid-cols-2">
               <div>
                 <label className="mb-1 block text-sm text-gray-600">İsim</label>
                 <input
                   type="text"
                   value={firstName}
                   onChange={(e) => onFirstNameChange(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
                   placeholder="Örn: Emre"
                 />
               </div>
@@ -164,21 +238,47 @@ export default function OnboardingEmptyState({
                   type="text"
                   value={lastName}
                   onChange={(e) => onLastNameChange(e.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2.5 outline-none transition focus:border-gray-500"
+                  className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 outline-none transition focus:border-gray-500"
                   placeholder="Örn: Yılmaz"
                 />
               </div>
-              <div className="sm:col-span-2">
+              <div className="sm:col-span-2 flex justify-center">
                 <button
                   type="submit"
-                  className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+                  className="w-full rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800 sm:w-auto"
                 >
-                  Profili Kaydet
+                  Profili Kaydet ve Devam Et
                 </button>
               </div>
             </form>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="mx-auto max-w-3xl rounded-[28px] border border-sky-200 bg-sky-50/70 p-5 text-center shadow-sm md:p-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-700">
+              Sıradaki Adım
+            </p>
+            <h3 className="mt-2 text-2xl font-semibold text-gray-900">
+              {currentStep.done ? "Kurulum tamamlandı" : currentStep.title}
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-gray-600">
+              {currentStep.done
+                ? "Temel kurulum tamamlandı. Artık dashboard normal görünümüyle çalışıyor."
+                : currentStep.description}
+            </p>
+            {currentStep.href && !currentStep.done ? (
+              <Link
+                href={currentStep.href}
+                className="mt-5 inline-flex items-center justify-center rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-800"
+              >
+                {currentStep.cta}
+              </Link>
+            ) : (
+              <div className="mt-5 inline-flex rounded-xl bg-white px-4 py-2.5 text-sm font-medium text-gray-600 ring-1 ring-gray-200">
+                Tüm temel adımlar tamamlandı
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-2">
           {steps.map((step, index) => (
