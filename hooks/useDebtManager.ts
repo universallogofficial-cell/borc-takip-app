@@ -6,6 +6,7 @@ import {
   updateDebtItem,
 } from "@/lib/debtService";
 import { getDebtLifecycleStatus, isClosedDebt } from "@/lib/debtLifecycle";
+import { getErrorMessage } from "@/lib/errorMessage";
 import { roundCurrency, toSafeNumber } from "@/lib/financeMath";
 import { formatCurrency } from "@/lib/formatCurrency";
 import { countPaymentsByDebtId } from "@/lib/paymentService";
@@ -75,7 +76,10 @@ export function useDebtManager({
     } catch (error) {
       console.error("Debt verisi alınamadı:", error);
       setDebts([]);
-      onMessage("Borç verisi alınamadı.", "error");
+      onMessage(
+        `Borç verisi alınamadı: ${getErrorMessage(error, "Bilinmeyen hata")}`,
+        "error",
+      );
     } finally {
       setLoadingDebts(false);
     }
@@ -128,6 +132,11 @@ export function useDebtManager({
 
   const handleAddDebt = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.info("[debt-manager] handleAddDebt:submit", {
+      isEditingDebt,
+      editingDebtId,
+      userId: userId ?? null,
+    });
 
     if (addingDebt) {
       return;
@@ -195,6 +204,11 @@ export function useDebtManager({
       due_day: dueDayValue,
     };
 
+    console.info("[debt-manager] handleAddDebt:payload", {
+      payload: debtPayload,
+      scopeOptions,
+    });
+
     try {
       if (isEditingDebt && editingDebtId !== null) {
         await updateDebtItem(editingDebtId, debtPayload, scopeOptions);
@@ -232,12 +246,14 @@ export function useDebtManager({
       });
       onMessage("Borç eklendi.", "success");
     } catch (error) {
+      const errorMessage = getErrorMessage(error, "Bilinmeyen hata");
+
       if (isEditingDebt && editingDebtId !== null) {
         console.error("Borç güncelleme hatası:", error);
-        onMessage("Borç güncellenemedi.", "error");
+        onMessage(`Borç güncellenemedi: ${errorMessage}`, "error");
       } else {
         console.error("Borç ekleme hatası:", error);
-        onMessage("Borç eklenemedi.", "error");
+        onMessage(`Borç eklenemedi: ${errorMessage}`, "error");
       }
     } finally {
       setAddingDebt(false);
@@ -279,7 +295,10 @@ export function useDebtManager({
       onMessage("Borç silindi.", "success");
     } catch (error) {
       console.error("Silme hatası:", error);
-      onMessage("Borç silinemedi.", "error");
+      onMessage(
+        `Borç silinemedi: ${getErrorMessage(error, "Bilinmeyen hata")}`,
+        "error",
+      );
     }
   };
 
