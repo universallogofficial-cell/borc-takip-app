@@ -318,6 +318,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     fetchCash,
     handleAddCash,
     handleEditCash,
+    handleDeleteCash,
     handleCancelCashEdit,
   } = useCashManager({
     onMessage: showMessage,
@@ -1280,6 +1281,7 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
                 onCashSearchChange={setCashSearch}
                 onExportCash={handleExportCash}
                 onEditCash={handleEditCash}
+                onDeleteCash={handleDeleteCash}
               />
             )}
           </>

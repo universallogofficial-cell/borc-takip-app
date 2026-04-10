@@ -10,6 +10,7 @@ type CashPanelProps = {
   onCashSearchChange: (value: string) => void;
   onExportCash: () => void;
   onEditCash: (item: CashItem) => void;
+  onDeleteCash: (id: number) => void;
 };
 
 export default function CashPanel({
@@ -20,6 +21,7 @@ export default function CashPanel({
   onCashSearchChange,
   onExportCash,
   onEditCash,
+  onDeleteCash,
 }: CashPanelProps) {
   return (
     <div className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-200">
@@ -112,13 +114,22 @@ export default function CashPanel({
                   <p className="font-semibold text-gray-900">
                     {formatCurrency(Number(cash.balance), currencyCode)}
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => onEditCash(cash)}
-                    className="mt-2 rounded-lg bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
-                  >
-                    Düzenle
-                  </button>
+                  <div className="mt-2 flex flex-wrap justify-start gap-2 sm:justify-end">
+                    <button
+                      type="button"
+                      onClick={() => onEditCash(cash)}
+                      className="rounded-lg bg-blue-500 px-3 py-1 text-sm text-white hover:bg-blue-600"
+                    >
+                      Düzenle
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => onDeleteCash(cash.id)}
+                      className="rounded-lg bg-red-500 px-3 py-1 text-sm text-white hover:bg-red-600"
+                    >
+                      Sil
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
