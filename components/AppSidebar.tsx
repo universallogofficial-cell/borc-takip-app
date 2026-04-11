@@ -4,30 +4,46 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const navigationItems = [
-  { href: "/app", label: "Dashboard" },
+  { href: "/app", label: "Genel Durum" },
   { href: "/app/debts", label: "Borçlar" },
-  { href: "/app/cash", label: "Kasalar" },
+  { href: "/app/cash", label: "Nakit" },
   { href: "/app/payments", label: "Ödemeler" },
   { href: "/app/settings", label: "Ayarlar" },
 ];
 
 function getLinkClass(isActive: boolean) {
   return isActive
-    ? "rounded-[18px] bg-slate-950 px-4 py-3 text-sm font-medium text-white shadow-[0_18px_34px_rgba(15,23,42,0.18)]"
-    : "rounded-[18px] px-4 py-3 text-sm font-medium text-slate-600 transition hover:bg-white hover:text-slate-950";
+    ? "rounded-full bg-[rgba(15,61,46,0.1)] px-4 py-2.5 text-sm font-semibold text-[#0f3d2e]"
+    : "rounded-full px-4 py-2.5 text-sm font-medium text-[#65716a] transition hover:bg-white/70 hover:text-[#1f2924]";
 }
 
 export default function AppSidebar() {
   const pathname = usePathname();
 
   return (
-    <>
-      <div className="sticky top-0 z-30 border-b border-slate-200/70 bg-[rgba(248,250,252,0.88)] px-4 py-3 backdrop-blur md:hidden">
-        <div className="mb-3">
-          <p className="text-sm font-semibold text-slate-950">Borç Takip</p>
-          <p className="text-xs text-slate-500">Kişisel finans alanları arasında geçiş yapın.</p>
+    <header className="sticky top-0 z-30 border-b border-[rgba(15,61,46,0.08)] bg-[rgba(247,248,244,0.78)] backdrop-blur-xl">
+      <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
+        <div className="flex items-center justify-between gap-4">
+          <Link href="/app" className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0f3d2e] text-white">
+              <span className="h-3 w-3 rounded-full bg-[#d5e5db]" />
+            </span>
+            <div>
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[#748179]">
+                Çalışma Alanı
+              </p>
+              <p className="text-base font-semibold tracking-[0.16em] text-[#1f2924]">
+                AKÇA
+              </p>
+            </div>
+          </Link>
+
+          <Link href="/" className="finance-button-ghost hidden md:inline-flex">
+            Ana sayfa
+          </Link>
         </div>
-        <nav className="flex gap-2 overflow-x-auto pb-1">
+
+        <nav className="flex gap-2 overflow-x-auto pb-1 md:pb-0">
           {navigationItems.map((item) => {
             const isActive = pathname === item.href;
 
@@ -43,43 +59,6 @@ export default function AppSidebar() {
           })}
         </nav>
       </div>
-
-      <aside className="fixed inset-y-0 left-0 z-20 hidden w-[17.5rem] px-4 py-4 md:block">
-        <div className="finance-surface-strong flex h-full flex-col rounded-[30px] p-5">
-          <div className="mb-8">
-            <p className="finance-kicker">Borç Takip</p>
-            <p className="mt-3 text-lg font-semibold text-slate-950">Finans çalışma alanı</p>
-            <p className="mt-1 text-sm text-slate-500">
-              Dashboard, kayıt akışları ve ayarlar
-            </p>
-          </div>
-
-          <nav className="space-y-2">
-            {navigationItems.map((item) => {
-              const isActive = pathname === item.href;
-
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`block ${getLinkClass(isActive)}`}
-                >
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="mt-auto rounded-[24px] bg-slate-950 px-4 py-4 text-white">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-white/60">
-              Ürün Notu
-            </p>
-            <p className="mt-2 text-sm font-medium">
-              Veriler hesap bazında tutulur ve yalnızca size ait görünür.
-            </p>
-          </div>
-        </div>
-      </aside>
-    </>
+    </header>
   );
 }

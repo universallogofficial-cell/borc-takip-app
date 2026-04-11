@@ -16,19 +16,19 @@ const statusConfig: Record<
 > = {
   today: {
     label: "Bugün",
-    className: "bg-amber-100 text-amber-800",
+    className: "finance-badge finance-badge-warn",
   },
   approaching: {
     label: "Yaklaşıyor",
-    className: "bg-sky-100 text-sky-800",
+    className: "finance-badge finance-badge-neutral",
   },
   passed: {
     label: "Geçti",
-    className: "bg-red-100 text-red-700",
+    className: "finance-badge finance-badge-danger",
   },
   later_this_month: {
-    label: "Bu Ay Sonra",
-    className: "bg-gray-100 text-gray-700",
+    label: "Bu ay",
+    className: "finance-badge finance-badge-good",
   },
 };
 
@@ -37,42 +37,46 @@ export default function UpcomingPayments({
   currencyCode,
 }: UpcomingPaymentsProps) {
   return (
-    <section className="mx-auto w-full max-w-4xl">
-      <div className="mb-6">
-        <p className="finance-kicker">Yaklaşan Ödemeler</p>
+    <section className="finance-panel mx-auto w-full max-w-4xl px-5 py-6 md:px-7">
+      <div className="mb-5 flex items-end justify-between gap-4">
+        <div>
+          <p className="finance-kicker">Ödeme Akışı</p>
+          <h3 className="font-display mt-2 text-3xl tracking-tight text-[#1f2924]">
+            Yaklaşan ödemeler
+          </h3>
+        </div>
+        <p className="text-sm text-[#65716a]">{items.length} kayıt</p>
       </div>
 
       {items.length === 0 ? (
-        <div className="finance-empty p-4 text-sm text-slate-500">
+        <div className="finance-empty p-4 text-sm text-[#65716a]">
           Henüz yaklaşan ödeme kaydı bulunmuyor.
         </div>
       ) : (
-        <div className="space-y-2">
+        <div>
           {items.map((item) => {
             const status = statusConfig[item.status];
 
             return (
               <div
                 key={item.id}
-                className="finance-surface flex flex-col gap-3 rounded-[24px] px-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                className="flex flex-col gap-4 border-b border-[rgba(15,61,46,0.08)] py-4 last:border-b-0 sm:flex-row sm:items-center sm:justify-between"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="break-words text-base font-medium text-slate-950">
+                  <p className="break-words text-base font-medium text-[#1f2924]">
                     {item.debtName}
                   </p>
-                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-slate-500">
+                  <div className="mt-1 flex flex-wrap gap-x-3 gap-y-1 text-sm text-[#65716a]">
                     <span>{item.institution}</span>
                     <span>Gün {item.dueDay}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-3 sm:justify-end">
-                  <p className="text-base font-semibold text-slate-950">
+                  <p className="text-base font-semibold text-[#1f2924]">
                     {formatCurrency(item.minimumPayment, currencyCode)}
                   </p>
-                  <span className={`finance-badge ${status.className}`}>
-                    {status.label}
-                  </span>
+                  <span className={status.className}>{status.label}</span>
                 </div>
               </div>
             );

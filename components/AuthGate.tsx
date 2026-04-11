@@ -242,35 +242,34 @@ export default function AuthGate({
   };
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#eef6ff_0%,#f4f7fb_38%,#e9eef5_100%)] p-4 md:p-6">
+    <main className="min-h-screen bg-[linear-gradient(180deg,#f7f8f4_0%,#eff1eb_100%)] p-4 md:p-6">
       <div className="mx-auto grid min-h-[calc(100vh-2rem)] max-w-6xl gap-6 lg:grid-cols-[minmax(0,1.04fr)_minmax(420px,0.96fr)] lg:items-center">
         <section className="finance-surface-strong hidden rounded-[36px] px-8 py-10 lg:block">
-          <span className="finance-badge finance-badge-good">Premium finans deneyimi</span>
-          <h1 className="mt-6 max-w-xl text-5xl font-semibold tracking-tight text-slate-950">
-            Borç, nakit ve ödeme düzenini tek merkezde kur.
+          <span className="finance-badge finance-badge-good">AKÇA</span>
+          <h1 className="font-display mt-6 max-w-xl text-6xl leading-[0.95] tracking-[-0.05em] text-[#1f2924]">
+            Finans düzenini sade bir yüzeyde topla.
           </h1>
-          <p className="mt-5 max-w-2xl text-base leading-8 text-slate-600">
-            Hesabına giriş yaptığında yönlendirilmiş onboarding, güvenli veri erişimi
-            ve karar destekli bir dashboard ile başlarsın. Ürün paneli değil, kişisel
-            finans çalışma alanı hissi verir.
+          <p className="mt-5 max-w-2xl text-base leading-8 text-[#65716a]">
+            Giriş yaptığında borçlarını, nakitini ve ödeme akışını aynı ritimde
+            görebileceğin sessiz bir çalışma alanı açılır.
           </p>
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
             <div className="finance-stat-card">
-              <p className="text-sm font-semibold text-slate-900">Verileriniz size özeldir</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Hesap bazlı görünür, oturum dışında açılmaz.
+              <p className="text-sm font-semibold text-[#1f2924]">Sadece sana ait</p>
+              <p className="mt-2 text-sm leading-6 text-[#65716a]">
+                Hesabına ait veriler yalnızca sana görünür.
               </p>
             </div>
             <div className="finance-stat-card">
-              <p className="text-sm font-semibold text-slate-900">Sade ama güçlü</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                İhtiyacın olan veriler öne çıkar, gürültü geri çekilir.
+              <p className="text-sm font-semibold text-[#1f2924]">Sessiz ama güçlü</p>
+              <p className="mt-2 text-sm leading-6 text-[#65716a]">
+                Kritik rakamlar öne çıkar, geri kalanı geri çekilir.
               </p>
             </div>
             <div className="finance-stat-card">
-              <p className="text-sm font-semibold text-slate-900">Hızlı başlangıç</p>
-              <p className="mt-2 text-sm leading-6 text-slate-600">
-                Google, e-posta veya giriş bağlantısı ile birkaç adımda hazır.
+              <p className="text-sm font-semibold text-[#1f2924]">Hızlı başlangıç</p>
+              <p className="mt-2 text-sm leading-6 text-[#65716a]">
+                Google, e-posta veya giriş bağlantısı ile hemen hazır.
               </p>
             </div>
           </div>
@@ -278,14 +277,14 @@ export default function AuthGate({
 
         <section className="finance-surface-strong w-full rounded-[32px] p-6 md:p-8">
           <div className="mb-6">
-            <p className="finance-kicker">Borç Takip</p>
-            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+            <p className="finance-kicker">AKÇA</p>
+            <h2 className="font-display mt-3 text-4xl tracking-tight text-[#1f2924]">
               {currentCopy.title}
             </h2>
-            <p className="mt-3 text-sm leading-6 text-slate-600">{currentCopy.description}</p>
+            <p className="mt-3 text-sm leading-6 text-[#65716a]">{currentCopy.description}</p>
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="finance-badge finance-badge-neutral">Ücretsiz kullanım</span>
-              <span className="finance-badge finance-badge-neutral">Verileriniz size özeldir</span>
+              <span className="finance-badge finance-badge-neutral">Verilerin sana özeldir</span>
             </div>
           </div>
 

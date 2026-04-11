@@ -264,7 +264,7 @@ export default function DebtForm({
         </div>
 
         <div className="finance-surface-muted md:col-span-2 rounded-[24px] p-4 text-sm text-slate-600">
-          Bu kayıt ödeme planı, risk görünümü ve yaklaşan ödemeler ekranında birlikte
+          Bu kayıt ödeme planı, bakiye özeti ve yaklaşan ödemeler ekranında birlikte
           kullanılır. Toplam borç ve asgari ödeme alanlarını mümkün olduğunca güncel
           tutun.
         </div>

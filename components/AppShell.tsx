@@ -39,11 +39,11 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="min-h-screen bg-transparent">
       <AppSidebar />
-      <div className="min-w-0 md:pl-[17.5rem]">
+      <div className="min-w-0">
         {!hasSession && (
-          <div className="hidden px-6 pt-4 md:block">
-            <div className="finance-surface rounded-[22px] px-4 py-3 text-sm text-slate-500">
-              Menü görünümü hazır. Yönetim alanlarını kullanmak için güvenli giriş yapın.
+          <div className="px-4 pt-4 md:px-6">
+            <div className="mx-auto max-w-6xl rounded-[22px] border border-[rgba(15,61,46,0.08)] bg-white/60 px-4 py-3 text-sm text-[#65716a] backdrop-blur">
+              Güvenli alan hazır. AKÇA çalışma alanını kullanmak için giriş yapın.
             </div>
           </div>
         )}

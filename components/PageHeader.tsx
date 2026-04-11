@@ -5,14 +5,10 @@ type PageHeaderProps = {
 
 export default function PageHeader({ title, subtitle }: PageHeaderProps) {
   return (
-    <div className="finance-panel px-5 py-6 md:px-7">
-      <p className="finance-kicker">
-        Borç Takip
-      </p>
-      <h1 className="finance-title mt-3 text-3xl md:text-4xl">
-        {title}
-      </h1>
-      <p className="finance-copy mt-3 max-w-3xl text-sm">{subtitle}</p>
+    <div className="px-1 py-2">
+      <p className="finance-kicker">AKÇA</p>
+      <h1 className="finance-title mt-3 text-4xl md:text-5xl">{title}</h1>
+      <p className="finance-copy mt-3 max-w-2xl text-sm md:text-base">{subtitle}</p>
     </div>
   );
 }

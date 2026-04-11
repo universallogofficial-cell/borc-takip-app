@@ -124,7 +124,7 @@ export default function OnboardingEmptyState({
     {
       title: "İlk borcunu ekle",
       description:
-        "Borç, vade ve asgari ödeme bilgileri risk görünümü ile öncelik motorunu besler.",
+        "Borç, vade ve asgari ödeme bilgileri ödeme akışını ve bakiye özetini netleştirir.",
       cta: "Borçlar sayfasına git",
       href: "/app/debts",
       done: hasDebt,
@@ -152,16 +152,13 @@ export default function OnboardingEmptyState({
     <section className="finance-panel px-5 py-8 md:px-8 md:py-10">
       <div className="mx-auto max-w-5xl space-y-6">
         <div className="finance-surface-strong rounded-[28px] px-5 py-8 text-center md:px-8">
-          <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-sky-800">
-            Yeni Kullanıcı Kurulumu
-          </span>
-          <h2 className="mt-4 text-3xl font-semibold tracking-tight text-gray-900 md:text-4xl">
+          <span className="finance-badge finance-badge-good">AKÇA başlangıç</span>
+          <h2 className="font-display mt-4 text-4xl tracking-tight text-gray-900 md:text-5xl">
             {hasProfile ? `${greetingName}, hazırsın.` : "Hoş geldin"}
           </h2>
           <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-gray-600 md:text-base">
-            Borçlarını ve nakit durumunu yönetmeye başla. İlk dört adımı tamamladığında
-            dashboard gerçek durumunu, risklerini ve sonraki hareketlerini net şekilde
-            gösterecek.
+            İlk dört adım tamamlandığında genel durum ekranı gerçek borç, nakit ve
+            ödeme akışını net şekilde göstermeye başlar.
           </p>
           <div className="mx-auto mt-6 grid max-w-3xl gap-3 text-left sm:grid-cols-3">
             <div className="finance-stat-card">
@@ -199,7 +196,7 @@ export default function OnboardingEmptyState({
           <div className="mx-auto mt-6 max-w-2xl">
             <div className="h-2 rounded-full bg-gray-200">
               <div
-                className="h-2 rounded-full bg-gradient-to-r from-sky-500 to-emerald-500 transition-all"
+                className="h-2 rounded-full bg-[linear-gradient(90deg,#0f3d2e_0%,#5e8f76_100%)] transition-all"
                 style={{ width: `${completionRate}%` }}
               />
             </div>

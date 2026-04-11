@@ -43,10 +43,7 @@ import { buildPayoffScenario, parsePayoffExtraBudget } from "@/lib/payoffPlanner
 import { addCashItem } from "@/lib/cashService";
 import { addDebtItem } from "@/lib/debtService";
 import { createPaymentItem } from "@/lib/paymentService";
-import {
-  buildCashRiskSummary,
-  buildMonthlyPerformanceSummary,
-} from "@/lib/riskOverview";
+import { buildCashRiskSummary } from "@/lib/riskOverview";
 import { buildUpcomingPayments } from "@/lib/upcomingPayments";
 import type {
   AppBackup,
@@ -76,25 +73,24 @@ const defaultProfile: UserProfile = {
 
 const pageConfig: Record<AppSection, { title: string; subtitle: string }> = {
   dashboard: {
-    title: "Dashboard",
-    subtitle: "Genel finans görünümü, risk durumu ve son aktiviteler burada.",
+    title: "Genel durum",
+    subtitle: "Borç, nakit ve ödeme akışını sade bir düzende izle.",
   },
   debts: {
     title: "Borçlar",
-    subtitle:
-      "Borç kayıtlarını yönetin, filtreleyin ve kapanan kayıtları arşivde izleyin.",
+    subtitle: "Borç kayıtlarını düzenle, filtrele ve arşivi sessizce takip et.",
   },
   cash: {
-    title: "Kasalar",
-    subtitle: "Kasa bakiyelerini yönetin, arayın ve ödeme etkilerini takip edin.",
+    title: "Nakit",
+    subtitle: "Bakiyelerini düzenle ve ödeme etkilerini tek yerde izle.",
   },
   payments: {
     title: "Ödemeler",
-    subtitle: "Ödeme kayıtlarını oluşturun, düzenleyin ve ödeme geçmişini izleyin.",
+    subtitle: "Ödeme kayıtlarını oluştur, güncelle ve geçmişi koru.",
   },
   settings: {
     title: "Ayarlar",
-    subtitle: "Görüntüleme tercihleri ve yedekleme işlemleri burada tutulur.",
+    subtitle: "Tercihlerini ve yedeklerini sakin bir yerden yönet.",
   },
 };
 
@@ -103,7 +99,11 @@ type AppWorkspaceProps = {
 };
 
 function SkeletonLine({ className }: { className: string }) {
-  return <div className={`animate-pulse rounded-2xl bg-slate-200/80 ${className}`} />;
+  return (
+    <div
+      className={`animate-pulse rounded-2xl bg-[rgba(15,61,46,0.08)] ${className}`}
+    />
+  );
 }
 
 function SectionLoadingState({
@@ -116,8 +116,8 @@ function SectionLoadingState({
   return (
     <div className="finance-panel p-5">
       <div className="mb-4">
-        <p className="text-sm font-medium text-slate-900">{title}</p>
-        <p className="text-sm text-slate-500">{description}</p>
+        <p className="text-sm font-medium text-[#1f2924]">{title}</p>
+        <p className="text-sm text-[#65716a]">{description}</p>
       </div>
       <div className="space-y-3">
         <SkeletonLine className="h-16 w-full" />
@@ -130,13 +130,13 @@ function SectionLoadingState({
 
 function DashboardLoadingSkeleton() {
   return (
-    <div className="space-y-12">
-      <SkeletonLine className="h-80 w-full" />
-      <div className="grid gap-4 sm:grid-cols-2">
-        <SkeletonLine className="h-24 w-full" />
-        <SkeletonLine className="h-24 w-full" />
+    <div className="space-y-8">
+      <SkeletonLine className="h-72 w-full rounded-[36px]" />
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SkeletonLine className="h-28 w-full" />
+        <SkeletonLine className="h-28 w-full" />
       </div>
-      <SkeletonLine className="h-72 w-full" />
+      <SkeletonLine className="h-80 w-full rounded-[32px]" />
     </div>
   );
 }
@@ -145,83 +145,110 @@ function FinancialSummaryHero({
   currencyCode,
   safeSpendableBalance,
   riskLabel,
-  statusNote,
   totalDebt,
-  urgentCount,
+  currentCash,
 }: {
   currencyCode: CurrencyCode;
   safeSpendableBalance: number;
   riskLabel: string;
-  statusNote: string;
   totalDebt: number;
-  urgentCount: number;
+  currentCash: number;
 }) {
-  const toneClass =
-    riskLabel === "Risk altındasın"
-      ? "from-red-50 via-white to-orange-50"
-      : riskLabel === "Dikkatli ol"
-        ? "from-amber-50 via-white to-yellow-50"
-        : "from-emerald-50 via-white to-cyan-50";
   const badgeClass =
     riskLabel === "Risk altındasın"
       ? "finance-badge finance-badge-danger"
       : riskLabel === "Dikkatli ol"
         ? "finance-badge finance-badge-warn"
         : "finance-badge finance-badge-good";
+  const statusLabel =
+    riskLabel === "Risk altındasın"
+      ? "Denge baskıda"
+      : riskLabel === "Dikkatli ol"
+        ? "Dikkat gerekli"
+        : "Dengede";
 
   return (
-    <section
-      className={`finance-surface-strong overflow-hidden rounded-[40px] bg-gradient-to-br ${toneClass} px-6 py-8 md:px-8 md:py-10`}
-    >
-      <div className="grid gap-10">
+    <section className="overflow-hidden rounded-[40px] bg-[linear-gradient(135deg,#123f31_0%,#0f3328_52%,#183f31_100%)] px-6 py-8 text-white shadow-[0_26px_60px_rgba(15,61,46,0.18)] md:px-8 md:py-10">
+      <div className="grid gap-8">
         <div className="max-w-3xl">
-          <p className="finance-kicker">Finansal Durum</p>
-          <h2 className="mt-4 text-6xl font-semibold tracking-tight text-slate-950 md:text-7xl">
+          <p className="text-sm font-semibold uppercase tracking-[0.22em] text-white/50">
+            Harcanabilir bakiye
+          </p>
+          <h2 className="font-display mt-5 text-6xl leading-[0.94] tracking-[-0.05em] text-[#f4f5f1] md:text-7xl">
             {formatCurrency(safeSpendableBalance, currencyCode)}
           </h2>
-          <p className="mt-3 text-sm font-medium text-slate-500">
-            Güvenli harcayabileceğin tutar
-          </p>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <span className={badgeClass}>{statusLabel}</span>
+            <p className="text-sm text-white/62">Bugünkü akışına göre güvenli alan</p>
+          </div>
 
-          <div className="mt-8 flex flex-wrap items-center gap-3">
+          <div className="mt-8">
             <Link href="/app/payments" className="finance-button-primary">
-              Ödeme Yap
-            </Link>
-            <Link href="/app/debts" className="finance-button-secondary">
-              Borç ekle
+              Ödeme yap
             </Link>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-start justify-between gap-6">
-          <div className="flex flex-col items-start gap-3">
-            <span className={badgeClass}>{riskLabel}</span>
-            <p className="max-w-md text-sm leading-6 text-slate-600">
-              {statusNote}
+        <div className="grid gap-3 sm:max-w-xl sm:grid-cols-2">
+          <div className="rounded-[24px] border border-white/10 bg-white/8 px-5 py-4 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/46">
+              Toplam yükün
+            </p>
+            <p className="mt-3 text-2xl font-semibold tracking-tight text-white">
+              {formatCurrency(totalDebt, currencyCode)}
             </p>
           </div>
-
-          <div className="grid w-full gap-3 sm:max-w-md sm:grid-cols-2">
-            <div className="rounded-[22px] bg-white/72 px-4 py-4 backdrop-blur-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Yaklaşan ödeme
-              </p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                {urgentCount}
-              </p>
-            </div>
-            <div className="rounded-[22px] bg-white/72 px-4 py-4 backdrop-blur-sm">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Bu ay toplam borç
-              </p>
-              <p className="mt-3 text-2xl font-semibold tracking-tight text-slate-950">
-                {formatCurrency(totalDebt, currencyCode)}
-              </p>
-            </div>
+          <div className="rounded-[24px] border border-white/10 bg-white/8 px-5 py-4 backdrop-blur-sm">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-white/46">
+              Nakitin
+            </p>
+            <p className="mt-3 text-2xl font-semibold tracking-tight text-white">
+              {formatCurrency(currentCash, currencyCode)}
+            </p>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function getDashboardStatusNote(riskSummary: ReturnType<typeof buildCashRiskSummary>) {
+  if (riskSummary.isInsufficient) {
+    return "Ödemeler nakdin üzerinde baskı kuruyor.";
+  }
+
+  if (riskSummary.warnings.length > 0) {
+    return "Nakit akışı dikkat istiyor.";
+  }
+
+  return "Görünen akış dengeli.";
+}
+
+function DashboardStatusStrip({
+  riskLabel,
+  statusNote,
+}: {
+  riskLabel: string;
+  statusNote: string;
+}) {
+  const badgeClass =
+    riskLabel === "Risk altındasın"
+      ? "finance-badge finance-badge-danger"
+      : riskLabel === "Dikkatli ol"
+        ? "finance-badge finance-badge-warn"
+        : "finance-badge finance-badge-good";
+  const badgeLabel =
+    riskLabel === "Risk altındasın"
+      ? "Baskı var"
+      : riskLabel === "Dikkatli ol"
+        ? "Dikkat"
+        : "Dengede";
+
+  return (
+    <div className="flex items-center gap-3 rounded-full border border-[rgba(15,61,46,0.08)] bg-white/72 px-4 py-3 text-sm text-[#65716a] backdrop-blur">
+      <span className={badgeClass}>{badgeLabel}</span>
+      <span>{statusNote}</span>
+    </div>
   );
 }
 
@@ -375,7 +402,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     paymentMinAmount,
     paymentMaxAmount,
     totalPaymentAmount,
-    thisMonthPaymentAmount,
     filteredPaymentAmount,
     last30DaysPaymentAmount,
     hasMorePayments,
@@ -555,21 +581,11 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     window.localStorage.setItem(profileStorageKey, JSON.stringify(profile));
   }, [profile, profileStorageKey]);
 
-  const { items: upcomingPaymentItems, summary: upcomingPaymentSummary } =
-    useMemo(() => buildUpcomingPayments(debts), [debts]);
+  const upcomingPaymentItems = useMemo(() => buildUpcomingPayments(debts).items, [debts]);
 
   const cashRiskSummary = useMemo(
     () => buildCashRiskSummary(debts, currentCash),
     [currentCash, debts],
-  );
-  const monthlyPerformance = useMemo(
-    () =>
-      buildMonthlyPerformanceSummary({
-        debts,
-        thisMonthPaymentTotal: thisMonthPaymentAmount,
-        last30DaysPaymentTotal: last30DaysPaymentAmount,
-      }),
-    [debts, last30DaysPaymentAmount, thisMonthPaymentAmount],
   );
   const parsedPlannerBudget = useMemo(
     () => parsePayoffExtraBudget(plannerExtraBudget),
@@ -621,59 +637,6 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
       })),
     [debtTableData, settings.currencyCode],
   );
-
-  const derivedActivities = useMemo<RecentActivityItem[]>(() => {
-    const debtActivities: RecentActivityItem[] = debts.map((item) => ({
-      id: `derived-debt-created-${item.id}`,
-      source: "derived",
-      entityType: "debt",
-      entityId: item.id,
-      action: "created",
-      actionLabel: "Borç eklendi",
-      title: item.name,
-      description:
-        item.institution && item.product_type
-          ? `${item.institution} • ${item.product_type}`
-          : item.institution || item.product_type || "Borç portföye eklendi.",
-      amount: roundCurrency(toSafeNumber(item.remaining_debt)),
-      createdAt: item.created_at,
-    }));
-
-    const cashActivities: RecentActivityItem[] = cashList.map((item) => ({
-      id: `derived-cash-created-${item.id}`,
-      source: "derived",
-      entityType: "cash",
-      entityId: item.id,
-      action: "created",
-      actionLabel: "Kasa eklendi",
-      title: item.name,
-      description: item.note || "Bakiye planlamasına dahil edildi.",
-      amount: roundCurrency(toSafeNumber(item.balance)),
-      createdAt: item.created_at,
-    }));
-
-    const paymentActivities: RecentActivityItem[] = payments.map((item) => {
-      const paymentRow = paymentRows.find((row) => row.id === item.id);
-
-      return {
-        id: `derived-payment-created-${item.id}`,
-        source: "derived",
-        entityType: "payment",
-        entityId: item.id,
-        action: "payment_made",
-        actionLabel: "Ödeme yapıldı",
-        title: paymentRow?.debtName || `Ödeme #${item.id}`,
-        description:
-          paymentRow?.cashName
-            ? `${paymentRow.cashName} kasasından işlendi.`
-            : "Ödeme hareketi kaydedildi.",
-        amount: roundCurrency(toSafeNumber(item.amount)),
-        createdAt: item.created_at,
-      };
-    });
-
-    return [...paymentActivities, ...debtActivities, ...cashActivities];
-  }, [cashList, debts, paymentRows, payments]);
 
   const handleExportCash = () => {
     try {
@@ -983,10 +946,10 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
 
   if (authLoading) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-gray-50 p-6">
-        <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200">
-          <p className="text-sm font-medium text-gray-900">Oturum hazırlanıyor</p>
-          <p className="mt-1 text-sm text-gray-500">
+      <main className="flex min-h-screen items-center justify-center bg-[#f4f5f1] p-6">
+        <div className="w-full max-w-md rounded-[28px] border border-[rgba(15,61,46,0.08)] bg-white/88 p-6 shadow-[0_18px_38px_rgba(20,36,28,0.05)]">
+          <p className="text-sm font-medium text-[#1f2924]">Oturum hazırlanıyor</p>
+          <p className="mt-1 text-sm text-[#65716a]">
             Hesap durumu kontrol ediliyor. Bu adım genelde birkaç saniye sürer.
           </p>
           <div className="mt-5 space-y-3">
@@ -1016,12 +979,13 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
     section === "dashboard" && shouldShowOnboarding
       ? {
           title: "Hoş geldin",
-          subtitle: "Borçlarını ve nakit durumunu yönetmeye başla.",
+          subtitle: "AKÇA ile borçlarını ve nakit akışını düzenlemeye başla.",
         }
       : pageConfig[section];
+  const dashboardStatusNote = getDashboardStatusNote(cashRiskSummary);
 
   return (
-    <main className="min-h-screen bg-transparent p-4 md:p-6">
+    <main className="min-h-screen bg-transparent px-4 pb-10 pt-5 md:px-6 md:pb-14 md:pt-6">
       {message && (
         <div
           className={`finance-toast fixed left-1/2 top-4 z-50 -translate-x-1/2 rounded-[18px] px-4 py-3 text-sm font-medium ${
@@ -1032,25 +996,18 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
         </div>
       )}
 
-      <div className="mx-auto max-w-7xl space-y-6">
-        <div className="finance-panel flex flex-col gap-4 rounded-[30px] p-4 sm:flex-row sm:items-center sm:justify-between md:px-5 md:py-5">
+      <div className="mx-auto max-w-6xl space-y-8">
+        <div className="flex flex-col gap-4 rounded-[28px] border border-[rgba(15,61,46,0.08)] bg-white/70 px-5 py-4 backdrop-blur sm:flex-row sm:items-center sm:justify-between">
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-slate-950">
-              {displayName}
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
+            <p className="text-sm font-semibold text-[#1f2924]">{displayName}</p>
+            <p className="mt-1 text-xs text-[#65716a]">
               {getAuthModeLabel(authContext)} • Para birimi: {settings.currencyCode} •
               Veriler bu hesaba özeldir
-            </p>
-            <p className="mt-2 text-xs text-slate-400">
-              Verileriniz oturum bazında ayrılır ve yalnızca bu hesap kapsamında gösterilir.
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            <span className="finance-badge finance-badge-good">
-              Oturum açık
-            </span>
+            <span className="finance-badge finance-badge-good">Oturum açık</span>
             <button
               type="button"
               onClick={handleSignOut}
@@ -1087,20 +1044,18 @@ export default function AppWorkspace({ section }: AppWorkspaceProps) {
                 hasPayment={hasPayment}
               />
             ) : (
-              <div className="space-y-14">
+              <div className="space-y-8">
                 <FinancialSummaryHero
                   currencyCode={settings.currencyCode}
                   safeSpendableBalance={safeSpendableBalance}
                   riskLabel={cashRiskSummary.statusLabel}
-                  statusNote={
-                    cashRiskSummary.isInsufficient
-                      ? "Mevcut görünümde nakit akışı baskı altında."
-                      : cashRiskSummary.warnings.length > 0
-                        ? "Mevcut durumda finansal denge dikkat istiyor."
-                        : "Mevcut durumda finansal denge stabil."
-                  }
                   totalDebt={totalDebtBalance}
-                  urgentCount={upcomingPaymentSummary.urgentCount}
+                  currentCash={currentCash}
+                />
+
+                <DashboardStatusStrip
+                  riskLabel={cashRiskSummary.statusLabel}
+                  statusNote={dashboardStatusNote}
                 />
 
                 <UpcomingPayments
