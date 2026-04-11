@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -24,18 +25,15 @@ export default function AppSidebar() {
     <header className="sticky top-0 z-30 border-b border-[rgba(15,61,46,0.08)] bg-[rgba(247,248,244,0.78)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-6xl flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-6">
         <div className="flex items-center justify-between gap-4">
-          <Link href="/app" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#0f3d2e] text-white">
-              <span className="h-3 w-3 rounded-full bg-[#d5e5db]" />
-            </span>
-            <div>
-              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.2em] text-[#748179]">
-                Çalışma Alanı
-              </p>
-              <p className="text-base font-semibold tracking-[0.16em] text-[#1f2924]">
-                AKÇA
-              </p>
-            </div>
+          <Link href="/app" className="inline-flex items-center">
+            <Image
+              src="/logo-akca.png"
+              alt="AKÇA"
+              width={132}
+              height={38}
+              priority
+              className="h-auto w-[104px] object-contain md:w-[112px]"
+            />
           </Link>
 
           <Link href="/" className="finance-button-ghost hidden md:inline-flex">

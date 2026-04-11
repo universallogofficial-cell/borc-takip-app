@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 const features = [
@@ -24,11 +25,15 @@ export default function LandingPage() {
       <div className="mx-auto max-w-6xl">
         <section className="overflow-hidden rounded-[40px] bg-[linear-gradient(135deg,#113f30_0%,#0d3227_55%,#173d30_100%)] px-6 py-6 text-white shadow-[0_28px_70px_rgba(15,61,46,0.18)] md:px-10 md:py-8 xl:px-14 xl:py-10">
           <header className="flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center md:justify-between">
-            <Link href="/" className="flex items-center gap-3">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-white/10">
-                <span className="h-3 w-3 rounded-full bg-[#d5e5db]" />
-              </span>
-              <span className="text-lg font-semibold tracking-[0.18em]">AKÇA</span>
+            <Link href="/" className="inline-flex items-center">
+              <Image
+                src="/logo-akca.png"
+                alt="AKÇA"
+                width={180}
+                height={52}
+                priority
+                className="h-auto w-[136px] object-contain md:w-[156px]"
+              />
             </Link>
 
             <nav className="flex flex-wrap items-center gap-2 text-sm text-white/72">

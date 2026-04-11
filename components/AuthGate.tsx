@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -277,7 +278,16 @@ export default function AuthGate({
 
         <section className="finance-surface-strong w-full rounded-[32px] p-6 md:p-8">
           <div className="mb-6">
-            <p className="finance-kicker">AKÇA</p>
+            <div className="mb-6 flex justify-center">
+              <Image
+                src="/logo-akca.png"
+                alt="AKÇA"
+                width={180}
+                height={52}
+                priority
+                className="h-auto w-[148px] object-contain"
+              />
+            </div>
             <h2 className="font-display mt-3 text-4xl tracking-tight text-[#1f2924]">
               {currentCopy.title}
             </h2>
