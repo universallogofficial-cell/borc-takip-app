@@ -78,18 +78,19 @@ const features = [
 
 function PhoneMockup() {
   return (
-    <div className="relative mx-auto w-full max-w-[27rem]">
-      <div className="absolute -bottom-10 left-1/2 h-20 w-[78%] -translate-x-1/2 rounded-full bg-[rgba(27,44,35,0.22)] blur-2xl" />
-      <div className="absolute right-2 top-14 h-44 w-44 rounded-full bg-[rgba(255,255,255,0.18)] blur-3xl" />
-      <div className="relative translate-y-4 rotate-[8deg]">
-        <div className="relative rounded-[3.2rem] bg-[linear-gradient(145deg,#f7f3ea_0%,#d8d2c4_38%,#fdfbf4_100%)] p-[0.42rem] shadow-[0_34px_70px_rgba(11,28,22,0.34)]">
+    <div className="relative mx-auto w-full max-w-[34rem]">
+      <div className="absolute -bottom-14 left-1/2 h-28 w-[88%] -translate-x-1/2 rounded-full bg-[rgba(13,31,24,0.32)] blur-[42px]" />
+      <div className="absolute -right-10 top-20 h-56 w-56 rounded-full bg-[rgba(255,255,255,0.22)] blur-[88px]" />
+      <div className="absolute left-8 top-44 h-52 w-52 rounded-full bg-[rgba(188,211,198,0.12)] blur-[90px]" />
+      <div className="relative translate-y-8 rotate-[9deg] scale-[1.08] md:translate-x-8 md:translate-y-12 md:scale-[1.16] xl:translate-x-12 xl:translate-y-16 xl:scale-[1.22]">
+        <div className="relative rounded-[3.35rem] bg-[linear-gradient(145deg,#fbf8f0_0%,#d7d0c0_34%,#fffdf7_100%)] p-[0.46rem] shadow-[0_48px_110px_rgba(7,24,18,0.42),0_12px_24px_rgba(255,255,255,0.22)_inset]">
           <div className="relative overflow-hidden rounded-[2.85rem] border border-black/6 bg-[#f6f2e8]">
             <div className="absolute left-1/2 top-3 z-20 h-6 w-28 -translate-x-1/2 rounded-full bg-[#ebe3d7]" />
             <div className="absolute right-[0.28rem] top-28 h-14 w-1 rounded-full bg-[#c6bfb2]" />
             <div className="absolute right-[0.28rem] top-44 h-10 w-1 rounded-full bg-[#c6bfb2]" />
             <div className="absolute left-[0.28rem] top-32 h-16 w-1 rounded-full bg-[#c6bfb2]" />
 
-            <div className="relative h-[37.5rem] bg-[linear-gradient(180deg,#163d31_0%,#234d3d_16%,#ece7dc_46%,#f7f3ea_100%)] px-4 pb-5 pt-5">
+            <div className="relative h-[41rem] bg-[linear-gradient(180deg,#12392d_0%,#214b3b_14%,#e8e1d3_42%,#f8f4eb_100%)] px-4 pb-5 pt-5">
               <div className="flex items-center justify-between px-2 pt-1 text-[0.6rem] font-semibold tracking-[0.08em] text-white/84">
                 <span>8:31</span>
                 <div className="flex items-center gap-1">
@@ -129,55 +130,55 @@ function PhoneMockup() {
                 </button>
               </div>
 
-              <div className="mt-6 rounded-[1.7rem] bg-[#f4efe6] p-4 shadow-[0_18px_30px_rgba(22,48,38,0.16)]">
+              <div className="mt-6 rounded-[1.8rem] bg-[#f8f4ec] p-4 shadow-[0_24px_44px_rgba(15,37,29,0.18)] ring-1 ring-black/3">
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <p className="text-[0.72rem] text-[#6d766f]">Harcanabilir bakiyen</p>
-                    <p className="mt-1 text-[2rem] font-semibold tracking-tight text-[#19382d]">
+                    <p className="mt-1 text-[2.15rem] font-semibold tracking-tight text-[#163328]">
                       € 8.750
                     </p>
                   </div>
-                  <span className="rounded-full bg-[#dbe8de] px-3 py-1.5 text-[0.72rem] font-semibold text-[#2d6a50]">
+                  <span className="rounded-full bg-[#dbe8de] px-3 py-1.5 text-[0.72rem] font-semibold text-[#2d6a50] shadow-[0_8px_18px_rgba(76,120,94,0.18)]">
                     + Ekle
                   </span>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-[1.5rem] bg-[#faf6ee] p-4 shadow-[0_18px_28px_rgba(22,48,38,0.12)]">
+              <div className="mt-4 rounded-[1.6rem] bg-[#fffaf2] p-4 shadow-[0_20px_38px_rgba(22,48,38,0.14)] ring-1 ring-black/3">
                 <div className="space-y-4">
                   <div>
-                    <div className="flex items-center justify-between text-[0.78rem] text-[#505a55]">
+                    <div className="flex items-center justify-between text-[0.8rem] text-[#48534d]">
                       <span>Toplam yükün</span>
-                      <span className="font-semibold text-[#2c3f36]">€ 62.700</span>
+                      <span className="font-semibold text-[#21372d]">€ 62.700</span>
                     </div>
-                    <div className="mt-2 h-2.5 rounded-full bg-[#dde4dc]">
-                      <div className="h-2.5 w-[68%] rounded-full bg-[linear-gradient(90deg,#7eb092_0%,#9dc7b2_100%)]" />
+                    <div className="mt-2.5 h-3 rounded-full bg-[#d7ddd5]">
+                      <div className="h-3 w-[68%] rounded-full bg-[linear-gradient(90deg,#6c9e82_0%,#a2cdb6_100%)]" />
                     </div>
                   </div>
 
                   <div>
-                    <div className="flex items-center justify-between text-[0.78rem] text-[#505a55]">
+                    <div className="flex items-center justify-between text-[0.8rem] text-[#48534d]">
                       <span>Nakitin</span>
-                      <span className="font-semibold text-[#2c3f36]">€ 34.500</span>
+                      <span className="font-semibold text-[#21372d]">€ 34.500</span>
                     </div>
-                    <div className="mt-2 h-2.5 rounded-full bg-[#dde4dc]">
-                      <div className="h-2.5 w-[44%] rounded-full bg-[linear-gradient(90deg,#7fb394_0%,#6f9d84_100%)]" />
+                    <div className="mt-2.5 h-3 rounded-full bg-[#d7ddd5]">
+                      <div className="h-3 w-[44%] rounded-full bg-[linear-gradient(90deg,#6e9f84_0%,#89b79c_100%)]" />
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[0.78rem] text-[#505a55]">
+                  <div className="flex items-center justify-between text-[0.8rem] text-[#48534d]">
                     <span>Durumun</span>
-                    <span className="font-semibold text-[#b06b60]">↳ -28.200</span>
+                    <span className="font-semibold text-[#b06259]">↳ -28.200</span>
                   </div>
                 </div>
               </div>
 
-              <div className="mt-4 rounded-[1.5rem] bg-[#faf6ee] p-4 shadow-[0_18px_28px_rgba(22,48,38,0.12)]">
-                <p className="text-[0.82rem] font-semibold text-[#2b4035]">
+              <div className="mt-4 rounded-[1.6rem] bg-[#fffaf2] p-4 shadow-[0_20px_38px_rgba(22,48,38,0.14)] ring-1 ring-black/3">
+                <p className="text-[0.84rem] font-semibold text-[#23392f]">
                   Yaklaşan ödemeler
                 </p>
 
-                <div className="mt-3 space-y-3">
+                <div className="mt-3.5 space-y-3.5">
                   {[
                     ["Akbank kredi kartı", "26 Mayıs", "€ 20.000"],
                     ["Araç kredisi", "28 Mayıs", "€ 2.700"],
@@ -185,17 +186,17 @@ function PhoneMockup() {
                   ].map(([title, date, amount]) => (
                     <div key={title} className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-3">
-                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#dbe8de]">
-                          <span className="h-3 w-3 rounded-[0.2rem] bg-[#588867]" />
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#dbe8de] shadow-[0_8px_18px_rgba(88,136,103,0.12)]">
+                          <span className="h-3 w-3 rounded-[0.2rem] bg-[#4f7b61]" />
                         </span>
                         <div>
-                          <p className="text-[0.74rem] font-medium text-[#33443b]">
+                          <p className="text-[0.75rem] font-medium text-[#2d3f36]">
                             {title}
                           </p>
-                          <p className="text-[0.68rem] text-[#808781]">{date}</p>
+                          <p className="text-[0.69rem] text-[#7d847e]">{date}</p>
                         </div>
                       </div>
-                      <span className="text-[0.74rem] font-semibold text-[#33443b]">
+                      <span className="text-[0.75rem] font-semibold text-[#2d3f36]">
                         {amount}
                       </span>
                     </div>
@@ -214,25 +215,28 @@ function PhoneMockup() {
 
 export default function LandingPage() {
   return (
-    <main className="min-h-screen overflow-hidden bg-[linear-gradient(180deg,#0d3a2d_0%,#184c3b_30%,#dfe4dc_74%,#f5f3eb_100%)]">
+    <main className="min-h-screen overflow-hidden bg-[#0f392d]">
       <div className="relative">
-        <div className="absolute inset-x-0 top-0 h-[48rem] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.09),transparent_26%),radial-gradient(circle_at_78%_26%,rgba(255,255,255,0.17),transparent_24%),radial-gradient(circle_at_50%_64%,rgba(255,255,255,0.08),transparent_38%)]" />
-        <div className="absolute inset-x-0 top-[22rem] h-[34rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.76)_0%,rgba(255,255,255,0.22)_38%,transparent_68%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,#0e382c_0%,#174838_24%,#2f6551_40%,#cad4ca_72%,#f4f1e8_100%)]" />
+        <div className="absolute inset-x-0 top-0 h-[58rem] bg-[radial-gradient(circle_at_18%_14%,rgba(255,255,255,0.08),transparent_24%),radial-gradient(circle_at_82%_20%,rgba(255,255,255,0.15),transparent_20%),radial-gradient(circle_at_56%_34%,rgba(255,255,255,0.06),transparent_30%)]" />
+        <div className="absolute right-[8%] top-[8rem] h-[34rem] w-[34rem] rounded-full bg-[radial-gradient(circle,rgba(244,246,240,0.58)_0%,rgba(244,246,240,0.18)_34%,transparent_68%)] blur-[26px]" />
+        <div className="absolute left-0 top-[20rem] h-[30rem] w-[56rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.18)_0%,rgba(255,255,255,0.06)_38%,transparent_72%)]" />
+        <div className="absolute inset-x-0 top-[30rem] h-[38rem] bg-[radial-gradient(ellipse_at_center,rgba(255,255,255,0.86)_0%,rgba(255,255,255,0.34)_32%,transparent_70%)]" />
 
-        <div className="relative mx-auto max-w-[78rem] px-4 pb-12 pt-7 md:px-8 md:pb-16 md:pt-10">
-          <header className="mx-auto flex max-w-[69rem] items-center justify-between rounded-[1.6rem] border border-black/5 bg-[rgba(252,249,243,0.96)] px-6 py-3.5 shadow-[0_12px_30px_rgba(12,34,26,0.14)] backdrop-blur md:px-7">
+        <div className="relative mx-auto max-w-[82rem] px-4 pb-16 pt-7 md:px-8 md:pb-24 md:pt-10">
+          <header className="mx-auto flex max-w-[69rem] items-center justify-between rounded-[1.45rem] border border-black/5 bg-[rgba(252,249,243,0.97)] px-5 py-2.5 shadow-[0_10px_26px_rgba(12,34,26,0.12)] backdrop-blur md:px-6">
             <Link href="/" className="shrink-0">
               <Image
                 src="/logo-akca.png"
                 alt="AKÇA"
-                width={160}
-                height={44}
+                width={176}
+                height={48}
                 priority
-                className="h-auto w-[118px] object-contain md:w-[132px]"
+                className="h-auto w-[128px] object-contain md:w-[144px]"
               />
             </Link>
 
-            <nav className="hidden items-center gap-7 text-[0.95rem] text-[#55615a] md:flex">
+            <nav className="hidden items-center gap-7 text-[0.92rem] text-[#55615a] md:flex">
               <a href="#ozellikler" className="hover:text-[#173d30]">
                 Özellikler
               </a>
@@ -244,45 +248,45 @@ export default function LandingPage() {
               </a>
               <Link
                 href="/app"
-                className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#245944_0%,#143a2d_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_10px_20px_rgba(21,57,43,0.18)]"
+                className="inline-flex items-center justify-center rounded-full bg-[linear-gradient(180deg,#245944_0%,#143a2d_100%)] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_18px_rgba(21,57,43,0.16)]"
               >
                 Ücretsiz başla
               </Link>
             </nav>
           </header>
 
-          <section className="mx-auto grid max-w-[69rem] gap-12 px-3 pb-24 pt-16 md:px-7 md:pb-36 md:pt-20 lg:grid-cols-[minmax(0,0.94fr)_minmax(0,1.06fr)] lg:items-center">
-            <div className="max-w-[28rem] pt-8 text-[#f6f2ea]">
-              <h1 className="font-display text-[3.7rem] leading-[0.94] tracking-[-0.055em] md:text-[5.2rem]">
+          <section className="mx-auto grid min-h-[52rem] max-w-[69rem] gap-10 px-3 pb-32 pt-18 md:px-7 md:pb-48 md:pt-24 lg:grid-cols-[minmax(0,0.82fr)_minmax(0,1.18fr)] lg:items-start">
+            <div className="max-w-[30rem] pt-12 text-[#f6f2ea] md:pt-16">
+              <h1 className="font-display text-[4.2rem] leading-[0.9] tracking-[-0.06em] md:text-[5.9rem] xl:text-[6.25rem]">
                 Paranın özüne dön.
               </h1>
-              <p className="mt-7 max-w-[23rem] text-[1.18rem] leading-[1.7] text-white/78">
+              <p className="mt-8 max-w-[24rem] text-[1.24rem] leading-[1.78] text-white/80">
                 Borçlarını, nakitini ve ödemelerini tek yerden yönet. Daha bilinçli
                 kararlar ver.
               </p>
-              <div className="mt-10">
+              <div className="mt-11">
                 <Link
                   href="/app"
-                  className="inline-flex items-center justify-center rounded-[1rem] bg-[linear-gradient(180deg,#295f48_0%,#143b2d_100%)] px-6 py-4 text-base font-semibold text-white shadow-[0_18px_34px_rgba(10,32,24,0.24)] transition hover:translate-y-[-1px]"
+                  className="inline-flex items-center justify-center rounded-[1rem] bg-[linear-gradient(180deg,#2c634c_0%,#143b2d_100%)] px-6 py-4 text-base font-semibold text-white shadow-[0_22px_42px_rgba(10,32,24,0.28)] transition hover:translate-y-[-1px]"
                 >
                   Ücretsiz başla
                 </Link>
               </div>
             </div>
 
-            <div className="relative flex justify-center lg:justify-end">
+            <div className="relative flex justify-center overflow-visible lg:justify-end">
               <PhoneMockup />
             </div>
           </section>
 
           <section
             id="ozellikler"
-            className="relative z-10 mx-auto -mt-8 grid max-w-[64rem] gap-5 md:grid-cols-3"
+            className="relative z-10 mx-auto mt-4 grid max-w-[64rem] gap-6 md:mt-8 md:grid-cols-3"
           >
             {features.map((feature) => (
               <article
                 key={feature.title}
-                className="rounded-[1.7rem] border border-white/58 bg-[rgba(250,247,241,0.92)] px-8 py-8 text-center shadow-[0_24px_50px_rgba(28,43,34,0.12)] backdrop-blur"
+                className="rounded-[1.9rem] border border-white/58 bg-[rgba(250,247,241,0.92)] px-9 py-9 text-center shadow-[0_30px_70px_rgba(28,43,34,0.11)] backdrop-blur"
               >
                 <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-[linear-gradient(180deg,#edf3ed_0%,#dfe8df_100%)] text-[#6d897a] shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]">
                   {feature.icon}
@@ -290,7 +294,7 @@ export default function LandingPage() {
                 <h2 className="mt-6 text-[1.7rem] font-semibold tracking-[-0.03em] text-[#294137]">
                   {feature.title}
                 </h2>
-                <p className="mx-auto mt-3 max-w-[15rem] text-base leading-7 text-[#738078]">
+                <p className="mx-auto mt-4 max-w-[15rem] text-base leading-7 text-[#738078]">
                   {feature.description}
                 </p>
               </article>
